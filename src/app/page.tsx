@@ -31,7 +31,7 @@ export default function Home() {
       </AnimatePresence>
 
       {/*About Me is Hero Section */}
-      <section id="hero" className="w-full scroll-mt-24">
+      <section id="hero" className="w-full">
         <AboutMe />
       </section>
 
@@ -45,7 +45,7 @@ export default function Home() {
       </section>
 
       {/* Experience Section */}
-      <section id="experience" className="w-full scroll-mt-24">
+      <section id="experience" className="w-full scroll-mt-[84px]">
         <ExperienceTimeline />
       </section>
 
@@ -54,7 +54,7 @@ export default function Home() {
       <Achievements />
 
       {/* Contact Section */}
-      <section id="contact" className="w-full scroll-mt-24">
+      <section id="contact" className="w-full scroll-mt-[84px]">
         <CalBooking />
       </section>
     </div>

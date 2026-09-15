@@ -2,8 +2,11 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
+import { Archivo_Black } from "next/font/google";
 import { motion, useScroll, useTransform } from "framer-motion";
 import Link from "next/link";
+
+const displayFont = Archivo_Black({ subsets: ["latin"], weight: "400" });
 
 const AboutMe = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -33,6 +36,28 @@ const AboutMe = () => {
         sizes="100vw"
       /> */}
 
+      {/* Giant name in the background, behind the video */}
+      <motion.div
+        aria-hidden="true"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center overflow-hidden"
+      >
+        <span
+          className={`${displayFont.className} bg-gradient-to-b from-primary via-primary/60 to-primary/10 bg-clip-text uppercase leading-[0.82] tracking-tight text-transparent`}
+          style={{ fontSize: "clamp(4rem, 17vw, 14rem)" }}
+        >
+          Gaurav
+        </span>
+        <span
+          className={`${displayFont.className} bg-gradient-to-b from-primary via-primary/60 to-primary/10 bg-clip-text uppercase leading-[0.82] tracking-tight text-transparent`}
+          style={{ fontSize: "clamp(4rem, 17vw, 14rem)" }}
+        >
+          Raj
+        </span>
+      </motion.div>
+
       <motion.div
         style={{
           y: yImage,
@@ -42,13 +67,14 @@ const AboutMe = () => {
         {/* Glow Effect */}
         <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full group-hover:bg-primary/30 transition-all duration-500" />
 
-        {/* <div className="relative w-full h-full rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl bg-neutral-900/50 backdrop-blur-sm"> */}
-        {/* Swap for your own hero video/photo — see README for the full asset list */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/ichigo.png"
-          alt="Profile photo"
-          className="relative w-[125vw] md:w-[60vw] lg:w-[40vw] h-[75vh] md:h-[75dvh] object-contain object-bottom rounded-3xl"
+        <video
+          src="/heropage-nobg.webm"
+          autoPlay
+          loop
+          muted
+          playsInline
+          preload="auto"
+          className="relative w-[155vw] md:w-[75vw] lg:w-[52vw] h-[92vh] md:h-[92dvh] object-contain object-bottom rounded-3xl"
         />
       </motion.div>
 

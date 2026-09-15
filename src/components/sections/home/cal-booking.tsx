@@ -41,7 +41,7 @@ const CalBooking = () => {
   return (
     <div
       ref={containerRef}
-      className="relative flex w-full flex-col overflow-hidden px-4 py-10 md:px-8 md:py-16 lg:h-[calc(100vh-6rem)] lg:py-0"
+      className="relative flex w-full flex-col overflow-hidden px-4 py-10 md:px-8 md:py-16 lg:h-[calc(100vh-84px)] lg:py-0"
     >
       {/* Box 3 — Heading, compact top band */}
       <div

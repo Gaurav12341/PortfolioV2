@@ -120,7 +120,7 @@ export default function ProjectsShowcase() {
 
       <section
         id="projects"
-        className="relative h-dvh md:h-screen w-full select-none overflow-hidden bg-black scroll-mt-24"
+        className="relative h-dvh md:h-screen w-full select-none overflow-hidden bg-black"
         style={{ touchAction: "pan-y" }}
         aria-label="Projects"
         onPointerDown={handleDragStart}
