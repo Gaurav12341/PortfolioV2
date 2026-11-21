@@ -46,3 +46,6 @@ aboutme.md
 # raw assets dropped in by hand (see public/_incoming/README.md)
 /public/_incoming/*
 !/public/_incoming/README.md
+
+# dev screenshots (Playwright captures during development)
+/docs/screens/

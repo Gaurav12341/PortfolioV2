@@ -3,6 +3,7 @@ import CalBooking from "@/components/sections/home/cal-booking";
 import Achievements from "@/components/sections/home/achievements";
 import { ExperienceTimeline } from "@/components/sections/home/timeline-demo";
 import ProjectsShowcase from "@/components/sections/showreel";
+import SupportRagSection from "@/components/sections/featured/supportrag-section";
 import CollabSec from "@/components/sections/home/collab-section";
 import AboutScrollSection from "@/components/sections/about/about-scroll-section";
 import AboutSection from "@/components/sections/about/about-section";
@@ -16,8 +17,11 @@ export default function Home() {
     <div className="flex min-h-screen flex-col items-center justify-center">
       <Hero />
 
-      {/* Projects: id="work" is set on the section inside ProjectsShowcase */}
-      <ProjectsShowcase />
+      {/* Work = featured project + work case studies */}
+      <div id="work" className="w-full scroll-mt-[88px]">
+        <SupportRagSection />
+        <ProjectsShowcase />
+      </div>
 
       <section id="about" className="w-full">
         <AboutScrollSection />

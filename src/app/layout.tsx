@@ -11,6 +11,7 @@ import StructuredData from "@/components/common/structured-data";
 import Analytics from "@/components/common/analytics";
 import ConsoleLog from "@/components/common/console-log";
 import CustomCursor from "@/components/ui/custom-cursor";
+import { IntroGate, introBootScript } from "@/components/common/intro-gate";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -118,6 +119,8 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <head>
+        {/* Decides before first paint whether the intro plays (once per session) */}
+        <script dangerouslySetInnerHTML={{ __html: introBootScript }} />
         <StructuredData />
         <Analytics />
       </head>
@@ -136,6 +139,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <CustomCursor />
+          <IntroGate />
           <LenisWrapper>
             <Navbar />
             <main id="main">{children}</main>

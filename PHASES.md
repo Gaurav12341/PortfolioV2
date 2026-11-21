@@ -81,7 +81,7 @@
 - H2: *Backend & Applied AI Engineer*
 - One line: *I build distributed systems and RAG pipelines that hold up under load — .NET, Kafka, Kubernetes, Python.*
 - CTAs: `View work` (primary, scrolls to work) · `Download résumé` (secondary) · `Book a call` (text link)
-- A row of 3 proof chips in mono: `20s → <3s dashboard queries` · `RAG accuracy 57.5% → 82.5%` · `5+ services migrated to Postgres`
+- A row of 3 proof chips in mono: `Production RAG · 150 field engineers` · `Agentic PDLC · ~$6K saved/release` · `20s → <3s dashboard queries`
 - A small scroll cue at the bottom.
 
 **Background canvas: `components/hero/SystemGraph.tsx`**
@@ -100,6 +100,8 @@
 ## Phase 3 — Featured project: SupportRAG (with demo video)
 
 This is the strongest proof for AI roles. It gets its own **featured section** above the work projects.
+
+> **Don't mix these up:** SupportRAG is my **personal, advanced RAG project** (public docs, eval harness, dev on AKS). It is **not** the production RAG system I built at work for field engineers. That one is a separate work case study in Phase 4 (project 2). Never mix their facts or numbers.
 
 **Asset prep** (I'll download the demo from Google Drive into `public/_incoming/supportrag-demo.mp4`). Then run:
 ```bash
@@ -164,11 +166,23 @@ Two animated bars or timelines for performance stories (for example a 20 s bar s
 
 ### 4d. Projects to build (facts in §11; ask me for any field marked ❓)
 1. **Dashboard query performance:** GraphQL filtering + pagination and Redis caching on an enterprise analytics/user-management dashboard. 50K records, **20 s → < 3 s**. Diagram: Client → API gateway → GraphQL service → Redis (cache hit path) / PostgreSQL (miss path). Use BeforeAfter.
-2. **MongoDB → PostgreSQL migration:** **5+ microservices** migrated, schemas redesigned, factory pattern to abstract data access. Diagram: services → repository factory → Mongo adapter / Postgres adapter, with a migration/backfill step and a cutover step.
-3. **4-agent human-in-the-loop SDLC workflow:** GitHub Copilot + Claude + Jira MCP. **~$6K saved in one release, 24 stories, 60+ test cases**, adopted by multiple teams. Diagram: Jira story → Agent 1 (requirements) → Agent 2 (design) → Agent 3 (code) → Agent 4 (tests), with human approval gates (`human` nodes) between stages. ❓ confirm the agent roles.
-4. **Kafka event reliability:** ❓ I'll give you the specifics (retries, DLQ, idempotency, ordering, the metric). Draft the diagram skeleton now: producers → topic partitions → consumer group → retry topic → DLQ → monitoring.
-5. **API Gateway security / SSO modernization:** ❓ specifics to come. Skeleton: client → API gateway (authN/Z, rate limit) → identity provider (SSO/OIDC) → downstream services.
-6. **NL-to-SQL agent:** ❓ specifics to come. Skeleton: user question → schema retriever → LLM SQL writer → validator/guard (read-only, allow-listed tables) → database → answer + SQL shown.
+2. **Production RAG assistant for field engineers (work):** used by **~150 field engineers** in production. This is a different system from SupportRAG. ❓ I'll give you the specifics: what it answers, data sources, retrieval stack, LLM, guardrails, and the impact metric. Draft the skeleton now: field engineer → chat UI → API → retriever over internal manuals/docs → LLM → cited answer, plus a feedback loop. Label it **Production** (allowed here, unlike SupportRAG).
+3. **MongoDB → PostgreSQL migration:** **5+ microservices** migrated, schemas redesigned, factory pattern to abstract data access. Diagram: services → repository factory → Mongo adapter / Postgres adapter, with a migration/backfill step and a cutover step.
+4. **End-to-end agentic PDLC workflow (flagship work case study).** Make this the **first and largest card** in the work grid, with the richest detail page.
+   - **One-liner:** *Designed and built a human-in-the-loop agent pipeline that takes a product idea from requirements to tested code, with agents in GitHub Copilot and Atlassian Rovo wired to Jira, Confluence, GitHub, SharePoint and Outlook.*
+   - **Impact cards:** `~$6K saved in one release` · `24 stories` · `60+ test cases` · `Adopted by multiple teams`.
+   - **Diagram (use a 3-lane swimlane layout plus an integration bus underneath):**
+     - **Lane 1: Requirements (Atlassian Rovo agents + GitHub Copilot).** Input idea/brief → **MRS** agent → **PRS** agent → **Epic** agent → **Story** agent → stories created in Jira. A human review gate sits between each artifact.
+     - **Lane 2: Development (GitHub Copilot).** Jira story pulled via MCP → Copilot with **custom skills + custom instructions** (repo conventions, architecture rules) → code + PR on GitHub → human code review.
+     - **Lane 3: Testing.** **Rovo Test agent** generates test scenarios from the story → **GitHub Copilot** turns the scenarios into **Playwright** scripts → automated web tests run → results linked back to the Jira story.
+     - **Integration bus** (bottom band; packets flow up into the lanes): **MCP** (GitHub Copilot ↔ Jira/GitHub) · **Atlassian API tokens** (Jira, Confluence REST) · **Confluence** (requirement docs) · **SharePoint** (source docs) · **Outlook via COM automation** (notifications/approvals by email).
+   - **Scroll story steps:** 1) brief in → requirements chain → 2) human approves MRS/PRS → 3) epics and stories land in Jira → 4) Copilot builds against the story with skills and instructions → 5) Rovo test agent writes scenarios → 6) Copilot generates Playwright scripts → 7) tests run and results flow back to Jira, with Outlook notifying stakeholders.
+   - **"Hard parts" accordion** (good interview material): connecting tools without admin access (API tokens, COM for Outlook instead of MS Graph), keeping humans in control at every gate, making agent output consistent via custom instructions/skills, traceability from requirement → story → code → test.
+   - Stack chips: GitHub Copilot (agents, skills, custom instructions) · Atlassian Rovo · MCP · Jira · Confluence · SharePoint · Outlook (COM) · Playwright · Atlassian REST API.
+   - ❓ Ask me: the exact number of agents per lane, whether Claude was part of it (an older résumé line says "GitHub Copilot, Claude and Jira MCP"), and whether "adopted by multiple teams" needs a number.
+5. **Kafka event reliability:** ❓ I'll give you the specifics (retries, DLQ, idempotency, ordering, the metric). Draft the diagram skeleton now: producers → topic partitions → consumer group → retry topic → DLQ → monitoring.
+6. **API Gateway security / SSO modernization:** ❓ specifics to come. Skeleton: client → API gateway (authN/Z, rate limit) → identity provider (SSO/OIDC) → downstream services.
+7. **NL-to-SQL agent:** ❓ specifics to come. Skeleton: user question → schema retriever → LLM SQL writer → validator/guard (read-only, allow-listed tables) → database → answer + SQL shown.
 
 For ❓ projects: build the card and diagram with clearly marked `TODO` text, and **list exactly which facts you need from me**. Don't fill in numbers.
 
@@ -206,7 +220,7 @@ Turn it from "okay" into the section that makes a manager want to talk to me.
 
 1. **Headline**, specific rather than generic. Options to show me: *"I like systems that stay boring at 3 a.m."* / *"Backend engineer who measures before he optimizes."* / *"I build things that keep working when the traffic doesn't behave."*
 2. **Short story** (3 short paragraphs, under 120 words in total): who I am (backend at Honeywell, ~2 years), what I do (.NET microservices, Kafka, Kubernetes, PostgreSQL, Redis), where I'm heading (applied AI: RAG, evals, agent workflows), and how I work (measure → fix → verify).
-3. **Stat row** (CountUp): `2+ yrs` building backend systems · `20s → <3s` dashboard latency · `5+` services migrated · `82.5%` RAG accuracy.
+3. **Stat row** (CountUp): `2+ yrs` building backend systems · `150` field engineers on my production RAG · `20s → <3s` dashboard latency · `~$6K` saved by my agentic PDLC pipeline in one release.
 4. **Stack, grouped** with simple-icons logos and mono labels: Backend (.NET/C#, Python, FastAPI, GraphQL, REST) · Data & streaming (Kafka, PostgreSQL, MongoDB, Redis, Qdrant) · Cloud & DevOps (Docker, Kubernetes, AKS, CI/CD) · AI (RAG, LLM evals, Claude Agent SDK, MCP, Groq). A slow marquee on desktop, a wrapped grid on mobile.
 5. **Timeline** (vertical, with a line that draws on scroll): SRM Institute of Science & Technology → Honeywell intern → Honeywell Software Engineer, with 1–2 lines each. ❓ I'll confirm dates.
 6. **Recognition strip:** Top Performer of the Month · Bronze & Win Together awards (zero-defect releases, SSO modernization) · Six Sigma Green Belt · Claude Academy badges (Claude Code in Action, MCP Advanced Topics, Human-Agent Teams) · Google Cohort Hackathon.
@@ -282,7 +296,8 @@ Turn it from "okay" into the section that makes a manager want to talk to me.
 - **Me:** Gaurav Raj, Software Engineer at Honeywell, Bengaluru. ~2 years. .NET, distributed systems, Kafka, Kubernetes, RAG/AI apps. SRM Institute of Science & Technology.
 - **Dashboard performance:** GraphQL filtering + pagination, Redis caching, 50K records, 20 s → under 3 s.
 - **Migration:** 5+ microservices MongoDB → PostgreSQL, schemas redesigned, factory design pattern for data access.
-- **Agent workflow:** 4-agent human-in-the-loop SDLC workflow across GitHub Copilot, Claude and Jira MCP. ~$6K saved in one release, 24 stories, 60+ test cases, adopted by multiple teams.
+- **Agentic PDLC workflow (work):** human-in-the-loop pipeline. Requirements agents (MRS, PRS, Epic, Story) in Atlassian Rovo + GitHub Copilot. Development with GitHub Copilot custom skills + custom instructions. Testing with a Rovo Test agent generating test scenarios and GitHub Copilot generating Playwright scripts for automated web testing. Integrations: MCP (GitHub Copilot ↔ Jira/GitHub), Atlassian API tokens, Jira, Confluence, SharePoint, Outlook via COM automation. ~$6K saved in one release, 24 stories, 60+ test cases, adopted by multiple teams.
+- **Production RAG (work):** used by ~150 field engineers in production. Everything else ❓, so ask me. Separate from SupportRAG.
 - **SupportRAG** (personal, Oct 2026, dev on AKS): ~5,400 public doc pages. Hybrid dense + BM25 with RRF in Qdrant. Access filters on both searches. Groq gpt-oss-120b writer + gpt-oss-20b claim checker, local Qwen2.5 failsafe. Accuracy 57.5% → 82.5% on the same 400 questions. Holdout 78.9% (30/38, 95% CI 63.7–88.9%). 82/82 unanswerable refused. 108-question reference set, LLM-judge with 29/30 hand-label agreement. ~82 ms retrieval per answered query. $0 cost. **Never** "production", **never** p50/p95.
 - **Recognition:** Top Performer of the Month; Bronze and Win Together awards (zero-defect releases, SSO modernization, cross-functional delivery); Six Sigma Green Belt; Claude Academy badges (Claude Code in Action, MCP Advanced Topics, Human-Agent Teams); Google Cohort Hackathon.
 - Anything else → ask me.

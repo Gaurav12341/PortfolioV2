@@ -26,7 +26,7 @@ export default function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 h-32 bg-gradient-to-b from-transparent to-background"
       />
 
-      <div className="mx-auto w-full max-w-6xl px-6 pb-24 pt-32 md:px-10 md:pt-36">
+      <div className="container-page pb-24 pt-32 md:pt-36">
         <div className="max-w-3xl">
           {/* Status */}
           <p
@@ -78,21 +78,27 @@ export default function Hero() {
           >
             {hero.proof.map((p) => (
               <li
-                key={p.label}
+                key={p.value}
                 className="inline-flex items-center gap-2 rounded-lg border border-line bg-surface-solid/70 px-3 py-1.5 font-mono text-xs text-muted-foreground backdrop-blur-sm"
               >
-                {p.before && (
+                {"tag" in p ? (
                   <>
-                    <span className="text-foreground/70 line-through decoration-foreground/30">
-                      {p.before}
+                    <span>{p.tag}</span>
+                    <span aria-hidden className="text-accent-text">
+                      ·
                     </span>
+                    <span className="font-semibold text-foreground">{p.value}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="text-foreground/70 line-through decoration-foreground/30">{p.before}</span>
                     <span aria-label="to" className="text-accent-text">
                       →
                     </span>
+                    <span className="font-semibold text-foreground">{p.value}</span>
+                    <span>{p.label}</span>
                   </>
                 )}
-                <span className="font-semibold text-foreground">{p.after}</span>
-                <span>{p.label}</span>
               </li>
             ))}
           </ul>

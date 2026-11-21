@@ -140,6 +140,10 @@
   html {
     font-family: var(--font-sans);
     -webkit-text-size-adjust: 100%;
+    /* Large monitors (27" / 1440p+): scale the whole rem-based layout up
+       gently from 1920px wide, 16px → 19px max at ~2520px, so content
+       doesn't sit as a narrow column in a sea of empty space. */
+    font-size: clamp(1rem, 0.5vw + 0.4rem, 1.1875rem);
   }
   body {
     @apply bg-background text-foreground;
@@ -202,10 +206,42 @@
     transform: translateY(250%);
   }
 }
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
 /* Usage: <div class="anim-fade-up" style="--d: 0.2s"> */
 .anim-fade-up {
   animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
   animation-delay: var(--d, 0s);
+}
+
+/* ── Intro preloader gate (see components/common/intro-gate.tsx) ────────── */
+html[data-intro="skip"] #intro-preloader {
+  display: none;
+}
+html.is-intro {
+  overflow: hidden;
+}
+/* Hold the hero's CSS entrance until the curtain lifts */
+html.is-intro .anim-fade-up,
+html.is-intro [data-word] {
+  animation-play-state: paused !important;
+}
+
+/* ── Page container: one width for every section ──────────────────────── */
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1.5rem;
+  @media (min-width: 768px) {
+    padding-inline: 2.5rem;
+  }
+  @media (min-width: 1800px) {
+    max-width: 80rem;
+  }
 }
 
 /* ── Lenis (recommended base styles) ───────────────────────────────────── */

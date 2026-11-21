@@ -13,10 +13,13 @@ export const hero = {
     secondary: { label: "Download résumé" },
     tertiary: { label: "Book a call", href: "#contact" },
   },
-  /** Mono proof chips: [before, after, label]. `before` may be empty. */
+  /**
+   * Mono proof chips. `tag` chips read "tag · value"; delta chips read
+   * "before → value label".
+   */
   proof: [
-    { before: "20s", after: "<3s", label: "dashboard queries" },
-    { before: "57.5%", after: "82.5%", label: "RAG accuracy" },
-    { before: "", after: "5+", label: "services migrated to Postgres" },
+    { tag: "Production RAG", value: "150 field engineers" },
+    { tag: "Agentic PDLC", value: "~$6K saved/release" },
+    { before: "20s", value: "<3s", label: "dashboard queries" },
   ],
 } as const;
