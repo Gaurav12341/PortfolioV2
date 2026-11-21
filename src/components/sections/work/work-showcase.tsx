@@ -10,6 +10,7 @@ import { DevTodo } from "@/components/common/dev-todo";
 import { globalTodos, platformContext, workProjects, type WorkProject } from "@/content/projects";
 import { cn } from "@/lib/utils";
 import { VariantToggle, type RagMode } from "./variant-toggle";
+import { HandNote } from "@/components/common/hand-note";
 
 /**
  * Work case studies carousel (PHASES.md · Phase 4, options B + C + D):
@@ -59,7 +60,12 @@ export default function WorkShowcase() {
           <span className="font-mono text-xs text-muted-foreground">Details generalised for privacy</span>
         </Reveal>
         <Reveal delay={0.05}>
-          <h2 className="mt-4 text-h1 font-semibold">Work Projects</h2>
+          <div className="relative mt-4 w-fit">
+            <h2 className="text-h1 font-bold">Work Projects</h2>
+            <HandNote className="absolute -right-5 top-2 translate-x-full -rotate-2">
+              <span aria-hidden>↙ </span>systems I built at Honeywell
+            </HandNote>
+          </div>
           <p className="mt-5 max-w-3xl text-lead text-muted-foreground">{platformContext}</p>
         </Reveal>
         <DevTodo items={globalTodos} className="mt-4 max-w-3xl" />

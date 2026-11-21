@@ -238,7 +238,7 @@ const AboutScrollSection = () => {
         >
           <span
             className="text-[10px] uppercase tracking-[0.35em] text-white/70 md:text-xs"
-            style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+            style={{ fontFamily: "var(--font-brand-mono), monospace" }}
           >
             Scroll to play
           </span>
@@ -289,7 +289,7 @@ const AboutScrollSection = () => {
                 data-reveal-line
                 className="mb-5 text-[10px] uppercase tracking-[0.3em] opacity-0 md:text-xs"
                 style={{
-                  fontFamily: "var(--font-geist-mono), monospace",
+                  fontFamily: "var(--font-brand-mono), monospace",
                   color: redColor,
                 }}
               >
@@ -342,7 +342,7 @@ const AboutScrollSection = () => {
                     <span
                       key={discipline}
                       className="flex items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-white/50"
-                      style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+                      style={{ fontFamily: "var(--font-brand-mono), monospace" }}
                     >
                       {i !== 0 && (
                         <span
@@ -359,7 +359,7 @@ const AboutScrollSection = () => {
               <p data-reveal-line className="opacity-0">
                 <span
                   className="text-xs uppercase tracking-[0.25em] text-white"
-                  style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+                  style={{ fontFamily: "var(--font-brand-mono), monospace" }}
                 >
                   Open to Opportunities
                 </span>{" "}

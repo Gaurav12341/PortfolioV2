@@ -26,18 +26,18 @@ type Layout = { nodes: NodeDef[]; edges: [string, string][]; routes: RouteDef[] 
 const DESKTOP: Layout = {
   nodes: [
     // ingress
-    { id: "client", x: 0.5, y: 0.14, label: "client" },
-    { id: "gw", x: 0.63, y: 0.27, label: "api-gw" },
+    { id: "client", x: 0.52, y: 0.11, label: "client" },
+    { id: "gw", x: 0.63, y: 0.2, label: "api-gw" }, // nudged above the nameplate
     { id: "auth", x: 0.76, y: 0.12, label: "auth" },
     // event pipeline
     { id: "producer", x: 0.67, y: 0.47, label: "producer" },
-    { id: "topic", x: 0.81, y: 0.37, label: "orders.topic" },
+    { id: "topic", x: 0.86, y: 0.37, label: "orders.topic" }, // nudged right of the nameplate
     { id: "consumer", x: 0.92, y: 0.53, label: "consumer-grp" },
     { id: "dlq", x: 0.95, y: 0.22, label: "dlq" },
     { id: "pg", x: 0.86, y: 0.74, label: "postgres" },
     { id: "redis", x: 0.74, y: 0.62, label: "redis" },
     // retrieval / AI
-    { id: "retriever", x: 0.57, y: 0.7, label: "retriever" },
+    { id: "retriever", x: 0.57, y: 0.66, label: "retriever" },
     { id: "qdrant", x: 0.66, y: 0.88, label: "qdrant" },
     { id: "bm25", x: 0.49, y: 0.9, label: "bm25" },
     { id: "llm", x: 0.79, y: 0.9, label: "llm" },
@@ -169,7 +169,7 @@ export default function SystemGraph({ className }: { className?: string }) {
       colors.text = cs.getPropertyValue("--text").trim() || colors.text;
       colors.accent = cs.getPropertyValue("--accent").trim() || colors.accent;
       colors.bg = cs.getPropertyValue("--bg").trim() || colors.bg;
-      mono = cs.getPropertyValue("--font-geist-mono").trim() || mono;
+      mono = cs.getPropertyValue("--font-brand-mono").trim() || mono;
     };
 
     const pointer = { x: 0, y: 0, active: false };
@@ -364,7 +364,7 @@ export default function SystemGraph({ className }: { className?: string }) {
       // Edges
       ctx.strokeStyle = colors.text;
       for (const e of edges) {
-        ctx.globalAlpha = 0.13 + e.heat * 0.07;
+        ctx.globalAlpha = 0.18 + e.heat * 0.09;
         ctx.beginPath();
         ctx.moveTo(e.a.x0, e.a.y0);
         ctx.quadraticCurveTo(e.cx, e.cy, e.b.x0, e.b.y0);
@@ -402,14 +402,14 @@ export default function SystemGraph({ className }: { className?: string }) {
           ctx.globalAlpha = 0.92;
           ctx.fillStyle = colors.bg;
           ctx.fill();
-          ctx.globalAlpha = 0.22 + glow * 0.5;
+          ctx.globalAlpha = 0.3 + glow * 0.5;
           ctx.strokeStyle = glow > 0.05 ? colors.accent : colors.text;
           ctx.stroke();
-          ctx.globalAlpha = 0.42 + n.hover * 0.45;
+          ctx.globalAlpha = 0.56 + n.hover * 0.4;
           ctx.fillStyle = colors.text;
           ctx.fillText(n.label, n.x0, n.y0 + 0.5);
         } else {
-          ctx.globalAlpha = 0.28 + glow * 0.5;
+          ctx.globalAlpha = 0.36 + glow * 0.5;
           ctx.fillStyle = glow > 0.05 ? colors.accent : colors.text;
           ctx.beginPath();
           ctx.arc(n.x0, n.y0, 3, 0, Math.PI * 2);

@@ -18,7 +18,7 @@ export default function Hero() {
       className="relative isolate flex min-h-svh w-full items-center overflow-hidden"
     >
       {/* Background graph. The mask keeps the area behind the text calm. */}
-      <GraphLoader className="absolute inset-0 -z-10 h-full w-full [mask-image:radial-gradient(ellipse_70%_60%_at_50%_45%,rgb(0_0_0/0.18)_0%,rgb(0_0_0/0.55)_55%,#000_100%)] md:[mask-image:radial-gradient(ellipse_42%_58%_at_27%_52%,rgb(0_0_0/0.12)_0%,rgb(0_0_0/0.5)_55%,#000_100%)]" />
+      <GraphLoader className="absolute inset-0 -z-10 h-full w-full [mask-image:radial-gradient(ellipse_70%_60%_at_50%_45%,rgb(0_0_0/0.18)_0%,rgb(0_0_0/0.55)_55%,#000_100%)] md:[mask-image:radial-gradient(ellipse_42%_58%_at_27%_52%,rgb(0_0_0/0.2)_0%,rgb(0_0_0/0.6)_55%,#000_100%)]" />
 
       {/* Soft fade into the next section */}
       <div
@@ -27,7 +27,7 @@ export default function Hero() {
       />
 
       <div className="container-page pb-24 pt-32 md:pt-36">
-        <div className="max-w-3xl">
+        <div className="max-w-4xl">
           {/* Status */}
           <p
             className="anim-fade-up mb-8 inline-flex items-center gap-2.5 rounded-full border border-line bg-surface-solid/70 py-1.5 pl-3 pr-4 font-mono text-xs text-muted-foreground backdrop-blur-sm"
@@ -40,21 +40,25 @@ export default function Hero() {
             {hero.status}
           </p>
 
-          <SplitText
-            as="h1"
-            text={hero.name}
-            immediate
-            delay={0.05}
-            stagger={0.09}
-            className="text-display font-semibold"
-          />
+          {/* The nameplate gets the full container width (the text column below
+              stays at max-w-4xl); it holds one line from ~1024px up. */}
+          <div className="relative w-fit max-w-[calc(100vw-3rem)] lg:-mr-[40vw]">
+            <SplitText
+              as="h1"
+              text={hero.name}
+              immediate
+              delay={0.05}
+              stagger={0.09}
+              className="text-display type-nameplate"
+            />
+          </div>
           {/* id for aria-labelledby (SplitText owns its own aria-label) */}
           <span id="hero-title" className="sr-only">
             {hero.name}, {hero.title}
           </span>
 
           <h2
-            className="anim-fade-up mt-4 text-h3 font-medium text-foreground md:mt-5"
+            className="anim-fade-up mt-4 text-h3 font-bold text-foreground md:mt-5"
             style={{ "--d": "0.25s" } as React.CSSProperties}
           >
             {hero.title}

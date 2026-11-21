@@ -89,7 +89,7 @@ const CollabSec: React.FC = () => {
             viewport={{ once: true }}
             className="text-[10px] md:text-xs tracking-[0.3em] uppercase mb-4"
             style={{
-              fontFamily: "var(--font-geist-mono), monospace",
+              fontFamily: "var(--font-brand-mono), monospace",
               color: redColor,
             }}
           >
@@ -205,7 +205,7 @@ const CollabSec: React.FC = () => {
                   <div className="w-20 h-20 rounded-full border border-white/60 flex items-center justify-center">
                     <span
                       className="text-white text-[10px] tracking-widest uppercase"
-                      style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+                      style={{ fontFamily: "var(--font-brand-mono), monospace" }}
                     >
                       Start
                     </span>
@@ -330,7 +330,7 @@ const CollabSec: React.FC = () => {
                   <div className="w-20 h-20 rounded-full border border-white/60 flex items-center justify-center">
                     <span
                       className="text-white text-[10px] tracking-widest uppercase"
-                      style={{ fontFamily: "var(--font-geist-mono), monospace" }}
+                      style={{ fontFamily: "var(--font-brand-mono), monospace" }}
                     >
                       Start
                     </span>
@@ -422,7 +422,7 @@ const CollabSec: React.FC = () => {
                         <text
                           fill={redColor}
                           style={{
-                            fontFamily: "var(--font-geist-mono), monospace",
+                            fontFamily: "var(--font-brand-mono), monospace",
                             fontSize: "7px",
                             letterSpacing: "2.5px",
                             textTransform: "uppercase",
@@ -536,7 +536,7 @@ const CollabSec: React.FC = () => {
                         <text
                           fill={redColor}
                           style={{
-                            fontFamily: "var(--font-geist-mono), monospace",
+                            fontFamily: "var(--font-brand-mono), monospace",
                             fontSize: "7px",
                             letterSpacing: "2.5px",
                             textTransform: "uppercase",

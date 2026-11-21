@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
+import { brandMono, brandSans, noteFont } from "./fonts";
 import "./globals.css";
 import { BASE_URL, OG_IMAGE } from "@/lib/constants";
 import LenisWrapper from "@/providers/lenis-provider";
@@ -116,7 +115,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${GeistSans.variable} ${GeistMono.variable}`}
+      className={`${brandSans.variable} ${brandMono.variable} ${noteFont.variable}`}
     >
       <head>
         {/* Decides before first paint whether the intro plays (once per session) */}

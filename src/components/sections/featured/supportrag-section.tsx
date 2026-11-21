@@ -8,6 +8,7 @@ import { ArchDiagram } from "@/components/diagram/ArchDiagram";
 import { DemoVideo } from "@/components/media/DemoVideo";
 import { supportRag, supportRagDiagram } from "@/content/supportrag";
 import { cn } from "@/lib/utils";
+import { HandNote } from "@/components/common/hand-note";
 
 /**
  * Featured project: SupportRAG (PHASES.md · Phase 3).
@@ -147,7 +148,12 @@ export default function SupportRagSection() {
                 <FlaskConical className="size-5" aria-hidden />
               </span>
               <span className="flex-1">
-                <span className="block text-h3 font-semibold">Engineering decisions</span>
+                <span className="flex items-baseline gap-4">
+                  <span className="block text-h3 font-semibold">Engineering decisions</span>
+                  <HandNote className="-rotate-2">
+                    <span aria-hidden>↙ </span>the ones the numbers killed
+                  </HandNote>
+                </span>
                 <span className="mt-0.5 block text-sm text-muted-foreground">
                   What I tried, measured, and turned off — {p.decisions.length} experiments
                 </span>
