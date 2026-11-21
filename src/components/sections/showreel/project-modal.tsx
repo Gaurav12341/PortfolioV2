@@ -32,7 +32,7 @@ export function ProjectModal({ item, onClose }: ProjectModalProps) {
                 Case Study
               </p>
               <h2
-                className="mt-3 font-mono font-black uppercase leading-tight tracking-wider text-white"
+                className="mt-3 font-sans font-bold uppercase leading-tight tracking-tight text-white"
                 style={{ fontSize: "clamp(1.75rem, 4.5vw, 3rem)" }}
               >
                 {item.title}
@@ -81,7 +81,7 @@ export function ProjectModal({ item, onClose }: ProjectModalProps) {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/70 to-transparent" />
 
           <p
-            className="absolute left-6 top-5 font-mono text-base font-bold tracking-widest text-white uppercase whitespace-nowrap"
+            className="absolute left-6 top-5 font-sans text-base font-bold tracking-widest text-white uppercase whitespace-nowrap"
             style={{ textShadow: "0 2px 20px rgba(0,0,0,0.9)" }}
           >
             {item?.title}

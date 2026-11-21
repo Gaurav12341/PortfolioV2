@@ -7,13 +7,13 @@ export default function manifest(): MetadataRoute.Manifest {
     description: 'Backend Software Engineer building distributed systems and cloud platforms, with hands-on experience shipping production AI/RAG systems.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#ffffff',
-    theme_color: '#000000',
+    background_color: '#0b0a0d',
+    theme_color: '#0b0a0d',
     icons: [
       {
-        src: '/md-red-logo.svg',
-        sizes: 'any',
-        type: 'image/svg+xml',
+        src: '/icon',
+        sizes: '64x64',
+        type: 'image/png',
       },
     ],
   }

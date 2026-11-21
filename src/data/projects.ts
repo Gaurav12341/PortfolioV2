@@ -46,7 +46,7 @@ export const projectsData: ProjectData[] = [
     problem:
       "Non-technical operations staff depended on engineers to write ad-hoc SQL every time they needed a KPI report, creating a constant backlog.",
     approach:
-      "Built an AI agent over the NurseCall schemas using few-shot prompting to translate plain-English questions into safe, validated SQL queries.",
+      "Built an AI agent over clinical-operations database schemas using few-shot prompting to translate plain-English questions into safe, validated SQL queries.",
     outcome:
       "Removed a manual reporting bottleneck, letting operations teams self-serve KPI reports without writing SQL.",
     gradient: "from-emerald-900 via-slate-900 to-black",

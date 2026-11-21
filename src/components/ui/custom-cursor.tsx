@@ -1,177 +1,130 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
+const INTERACTIVE =
+  "a, button, [role='button'], summary, label[for], select, .cursor-pointer, [data-cursor='hover']";
+const TEXT_FIELD = "input, textarea, [contenteditable='true'], iframe";
+
+/**
+ * Subtle custom cursor: a small accent dot that tracks the pointer exactly,
+ * plus a thin ring that lags behind and grows over interactive elements.
+ *
+ * - Positions are written straight to `transform` in a rAF loop (no React
+ *   re-renders per mousemove), and the loop sleeps once the ring settles.
+ * - Disabled on touch / coarse pointers and under prefers-reduced-motion,
+ *   where the native cursor is left alone.
+ * - Hidden over text fields and iframes so the I-beam / embed cursors work.
+ */
 export default function CustomCursor() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [hoverState, setHoverState] = useState<
-    "default" | "link" | "button" | "text"
-  >("default");
-  const [hoverText, setHoverText] = useState("");
-  const [isVisible, setIsVisible] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const dotRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    // Check if it's a touch device
-    if (window.matchMedia("(pointer: coarse)").matches) {
-      setIsTouchDevice(true);
-      return;
-    }
-
-    const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-      setIsVisible((prev) => {
-        if (!prev) return true;
-        return prev;
-      });
-    };
-
-    const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (!target || !target.tagName) return;
-
-      // Find the closest clickable element
-      const clickable = target.closest(
-        "a, button, input, textarea, select, [role='button'], .cursor-pointer",
-      );
-
-      if (clickable) {
-        const text = clickable.getAttribute("data-cursor-text");
-        if (text) {
-          setHoverState("text");
-          setHoverText(text);
-        } else if (clickable.tagName.toLowerCase() === "a") {
-          setHoverState("link");
-        } else {
-          setHoverState("button");
-        }
-      } else {
-        setHoverState("default");
-        setHoverText("");
-      }
-    };
-
-    const handleMouseLeave = () => {
-      setIsVisible(false);
-    };
-
-    const handleMouseEnter = () => {
-      setIsVisible(true);
-    };
-
-    window.addEventListener("mousemove", updateMousePosition);
-    window.addEventListener("mouseover", handleMouseOver);
-    document.addEventListener("mouseleave", handleMouseLeave);
-    document.addEventListener("mouseenter", handleMouseEnter);
-
-    // Add global style to hide cursor on all elements
-    const style = document.createElement("style");
-    style.innerHTML = `
-      * {
-        cursor: none !important;
-      }
-    `;
-    document.head.appendChild(style);
-
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setEnabled(fine.matches && !reduce.matches);
+    update();
+    fine.addEventListener("change", update);
+    reduce.addEventListener("change", update);
     return () => {
-      window.removeEventListener("mousemove", updateMousePosition);
-      window.removeEventListener("mouseover", handleMouseOver);
-      document.removeEventListener("mouseleave", handleMouseLeave);
-      document.removeEventListener("mouseenter", handleMouseEnter);
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
+      fine.removeEventListener("change", update);
+      reduce.removeEventListener("change", update);
     };
   }, []);
 
-  if (isTouchDevice || !isVisible) return null;
+  useEffect(() => {
+    if (!enabled) return;
+    const dot = dotRef.current;
+    const ring = ringRef.current;
+    if (!dot || !ring) return;
 
-  const isHovering = hoverState !== "default";
-  const showIcon = hoverState === "link";
-  const showText = hoverState === "text";
+    document.documentElement.classList.add("has-custom-cursor");
+
+    const target = { x: -100, y: -100 };
+    const pos = { x: -100, y: -100 };
+    let scale = 1;
+    let targetScale = 1;
+    let visible = false;
+    let frame = 0;
+
+    const render = () => {
+      pos.x += (target.x - pos.x) * 0.2;
+      pos.y += (target.y - pos.y) * 0.2;
+      scale += (targetScale - scale) * 0.2;
+      ring.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0) translate(-50%, -50%) scale(${scale})`;
+
+      const settled =
+        Math.abs(target.x - pos.x) < 0.1 &&
+        Math.abs(target.y - pos.y) < 0.1 &&
+        Math.abs(targetScale - scale) < 0.005;
+      frame = settled ? 0 : requestAnimationFrame(render);
+    };
+    const wake = () => {
+      if (!frame) frame = requestAnimationFrame(render);
+    };
+
+    const setVisible = (v: boolean) => {
+      if (v === visible) return;
+      visible = v;
+      dot.style.opacity = v ? "1" : "0";
+      ring.style.opacity = v ? "1" : "0";
+    };
+
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      target.x = e.clientX;
+      target.y = e.clientY;
+      dot.style.transform = `translate3d(${e.clientX}px, ${e.clientY}px, 0) translate(-50%, -50%)`;
+
+      const el = e.target as Element | null;
+      const overText = !!el?.closest?.(TEXT_FIELD);
+      const overInteractive = !overText && !!el?.closest?.(INTERACTIVE);
+      setVisible(!overText);
+      targetScale = overInteractive ? 1.6 : 1;
+      ring.dataset.hover = overInteractive ? "true" : "false";
+      wake();
+    };
+
+    const onLeave = () => setVisible(false);
+    const onDown = () => {
+      targetScale *= 0.85;
+      wake();
+    };
+    const onUp = (e: PointerEvent) => onMove(e);
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    window.addEventListener("pointerdown", onDown, { passive: true });
+    window.addEventListener("pointerup", onUp, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onLeave);
+    window.addEventListener("blur", onLeave);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      document.documentElement.classList.remove("has-custom-cursor");
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("pointerup", onUp);
+      document.documentElement.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("blur", onLeave);
+    };
+  }, [enabled]);
+
+  if (!enabled) return null;
 
   return (
     <>
-      {/* Main dot */}
-      <motion.div
-        className="fixed top-0 left-0 w-2 h-2 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
-        animate={{
-          x: mousePosition.x - 4,
-          y: mousePosition.y - 4,
-          scale: isHovering ? 0 : 1,
-          opacity: isHovering ? 0 : 1,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 1000,
-          damping: 40,
-          mass: 0.1,
-        }}
+      <div
+        ref={ringRef}
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-[9998] size-8 rounded-full border border-foreground/35 opacity-0 transition-[opacity,background-color,border-color] duration-300 data-[hover=true]:border-brand/60 data-[hover=true]:bg-brand/10"
       />
-
-      {/* Trailing circle / Hover state */}
-      <motion.div
-        className="fixed top-0 left-0 rounded-full pointer-events-none z-[9998] mix-blend-difference flex items-center justify-center overflow-hidden"
-        animate={{
-          x: isHovering ? mousePosition.x - 40 : mousePosition.x - 16,
-          y: isHovering ? mousePosition.y - 40 : mousePosition.y - 16,
-          width: isHovering ? 80 : 32,
-          height: isHovering ? 80 : 32,
-          backgroundColor: isHovering
-            ? "rgba(255, 255, 255, 1)"
-            : "transparent",
-          border: isHovering
-            ? "0px solid rgba(255, 255, 255, 0)"
-            : "1px solid rgba(255, 255, 255, 1)",
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 400,
-          damping: 28,
-          mass: 0.5,
-        }}
-      >
-        <AnimatePresence mode="wait">
-          {showIcon && (
-            <motion.div
-              key="icon"
-              initial={{ opacity: 0, scale: 0.5, rotate: -45 }}
-              animate={{ opacity: 1, scale: 1, rotate: 0 }}
-              exit={{ opacity: 0, scale: 0.5, rotate: 45 }}
-              transition={{ duration: 0.2 }}
-              className="text-black"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="28"
-                height="28"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="7" y1="17" x2="17" y2="7"></line>
-                <polyline points="7 7 17 7 17 17"></polyline>
-              </svg>
-            </motion.div>
-          )}
-          {showText && (
-            <motion.div
-              key="text"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              transition={{ duration: 0.2 }}
-              className="text-black text-sm font-bold uppercase tracking-widest"
-            >
-              {hoverText}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      <div
+        ref={dotRef}
+        aria-hidden
+        className="pointer-events-none fixed left-0 top-0 z-[9999] size-1.5 rounded-full bg-brand opacity-0 transition-opacity duration-200"
+      />
     </>
   );
 }

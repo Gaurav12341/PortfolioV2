@@ -24,8 +24,6 @@ const AboutMe = () => {
       ref={containerRef}
       className="relative h-dvh md:h-screen w-full overflow-hidden flex flex-col items-center justify-end"
     >
-      {/* Background Noise Texture for Awwwards feel */}
-      <div className="absolute inset-0 z-0 opacity-[0.05] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       {/* <Image
         src="/bg-hero.png"
         fill

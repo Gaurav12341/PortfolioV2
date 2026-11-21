@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useRef, useEffect, useState } from "react";
-import Image from "next/image";
 import { motion, useScroll, useTransform, useInView } from "motion/react";
 
 // ─── Animated counter hook ────────────────────────────────────────────────────
@@ -171,15 +170,21 @@ const AboutSection = () => {
               {/* Border frame */}
               <div className="absolute -inset-px rounded-3xl border border-primary/15 z-20 pointer-events-none" />
 
-              {/* TODO: swap for your own headshot — see README asset checklist */}
-              <Image
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1200&auto=format&fit=crop"
-                alt="Gaurav Raj"
-                fill
-                priority
-                className="object-cover object-top transition-transform duration-700 group-hover:scale-105"
-                sizes="(max-width: 1024px) 340px, 28vw"
-              />
+              {/* Placeholder until the real portrait lands (Phase 5/6). Never use a stock photo here. */}
+              <div
+                aria-hidden
+                className="absolute inset-0 flex items-center justify-center bg-surface-solid"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
+                  backgroundSize: "24px 24px",
+                }}
+              >
+                <span className="flex items-center gap-2 font-mono text-7xl font-semibold tracking-tighter text-foreground/80">
+                  gr
+                  <span className="inline-block h-14 w-6 rounded-sm bg-brand" />
+                </span>
+              </div>
 
               {/* Bottom fade */}
               <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-linear-to-t from-background via-background/50 to-transparent z-10" />

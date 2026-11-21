@@ -107,7 +107,7 @@ The page also pulls `https://grainy-gradients.vercel.app/noise.svg` (hero noise 
 
 ### New findings
 6. ❗ **Stock photo of a different person.** `about-section.tsx` shows an **Unsplash portrait of a woman** labelled "Gaurav Raj · Software Engineer I, Honeywell". A recruiter seeing this would lose trust immediately. I think this has to go now, regardless of phase.
-7. **Metric inconsistencies on the live page:** "48+ healthcare networks" vs "50+" elsewhere, and "63% faster deployments" vs "67%" elsewhere.
+7. ~~Metric inconsistencies~~ **Retracted:** the code says 50+ and 67%. The screenshot caught the count-up animation mid-way (48, 63).
 8. **NDA leak:** "NurseCall schemas" (an internal product/module name) appears in `data/projects.ts` and `timeline-demo.tsx`.
 9. **Borrowed copy** beyond the booking heading: "I'd rather let the work do the talking" (about sequence; the plan explicitly bans it) and "Results that speak loudly".
 10. **Preloader blocks first paint.** The page is a single `"use client"` component and the hero only appears after the preloader slides away. LCP was flagged on the logo.

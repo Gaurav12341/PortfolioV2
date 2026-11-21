@@ -39,7 +39,7 @@ export function ExperienceTimeline() {
             tagline="From Ambiguous Problems to Production"
             bullets={[
               "Built cloud and air-gapped RAG pipelines (Vertex AI/Gemini, Ollama, pgvector, FAISS, Chroma) delivering under-5-second retrieval for 150+ field engineers.",
-              "Built an NL-to-SQL AI agent (Python, FastAPI, PostgreSQL, few-shot prompting) over NurseCall schemas, letting non-technical users self-serve KPI reports.",
+              "Built an NL-to-SQL AI agent (Python, FastAPI, PostgreSQL, few-shot prompting) over clinical-operations data, letting non-technical users self-serve KPI reports.",
               "Automated AI-assisted engineering workflows (GitHub/Jira MCP, TypeScript, Playwright), improving regression coverage and delivery consistency.",
               "Cut release cycles by 50% and manual effort by 60%, saving ~80 engineering hours/month, via CI/CD and deployment automation.",
               "Delivered backend integration through C#/.NET 8 REST and gRPC services connecting React/TypeScript dashboards to real-time healthcare analytics.",

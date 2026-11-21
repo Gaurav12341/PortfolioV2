@@ -35,7 +35,7 @@ export default function Home() {
         <AboutMe />
       </section>
 
-      {/* Projects Section — id="projects" is set on the section inside ProjectsShowcase */}
+      {/* Projects Section — id="work" is set on the section inside ProjectsShowcase */}
       <ProjectsShowcase />
 
       {/* About Scroll Section */}

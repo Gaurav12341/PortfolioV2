@@ -119,7 +119,7 @@ export default function ProjectsShowcase() {
       <ProjectModal item={modal} onClose={() => setModal(null)} />
 
       <section
-        id="projects"
+        id="work"
         className="relative h-dvh md:h-screen w-full select-none overflow-hidden bg-black"
         style={{ touchAction: "pan-y" }}
         aria-label="Projects"

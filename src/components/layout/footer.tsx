@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { Logo } from "@/components/brand/logo";
 import { useRef, useEffect } from "react";
 import { FaGithub, FaLinkedin, FaArrowRight } from "react-icons/fa6";
 import { SiLeetcode } from "react-icons/si";
@@ -161,18 +161,7 @@ export default function CreativeFooter() {
             className="col-span-1 md:col-span-5 flex flex-col gap-6"
           >
             <Link href="/" className="flex w-fit items-center gap-3">
-              <div className="relative size-12 overflow-hidden rounded-xl bg-linear-to-br from-background to-muted border border-border shadow-sm flex items-center justify-center">
-                <Image
-                  src="/md-red-logo.svg"
-                  alt="Md Logo"
-                  width={32}
-                  height={32}
-                  className="object-contain"
-                />
-              </div>
-              <span className="text-xl font-bold tracking-tight">
-                Gaurav Raj
-              </span>
+              <Logo withName />
             </Link>
             <p className="max-w-xs text-muted-foreground text-sm leading-relaxed">
               Backend Software Engineer building distributed systems and cloud
@@ -194,7 +183,7 @@ export default function CreativeFooter() {
             </h3>
             {[
               { label: "Home", href: "#hero" },
-              { label: "Projects", href: "#projects" },
+              { label: "Projects", href: "#work" },
               { label: "Experience", href: "#experience" },
               { label: "About", href: "#about" },
               { label: "Contact", href: "#contact" },
