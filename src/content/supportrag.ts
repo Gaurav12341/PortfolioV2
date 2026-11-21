@@ -8,9 +8,12 @@ import type { DiagramSpec } from "@/components/diagram/types";
 export const supportRag = {
   eyebrow: "Featured project",
   title: "SupportRAG",
-  meta: "Personal project · Oct 2026 · dev on AKS",
+  meta: "Personal project · Oct 2026 · Open code on GitHub",
   summary:
-    "A citation-grounded troubleshooting copilot over 5,400 pages of Kubernetes, PostgreSQL, Kafka and GitHub Actions docs. It refuses when the docs have no fix.",
+    "A citation-grounded troubleshooting copilot over ~5,400 pages of Kubernetes, PostgreSQL, Kafka and GitHub Actions docs. It refuses with “No documented fix found” when the docs don't have the answer.",
+  why: "Built to go deeper than my work RAG on retrieval quality, guardrails and measurable evaluation.",
+  evalNote:
+    "108-question reference set · LLM-as-judge from a different model family, validated against hand labels (29/30 agreement) · Wilson CIs · failure taxonomy (retrieval miss, generation error, verifier false refusal, unsafe claim).",
 
   video: {
     mp4: "/videos/supportrag.mp4",
@@ -26,7 +29,7 @@ export const supportRag = {
       from: "57.5%",
       value: "82.5%",
       label: "answer accuracy",
-      detail: "Same 400 questions, vs. a dense-only baseline",
+      detail: "Same 400 questions · baseline: dense-only retrieval, plain prompt, basic guardrails",
     },
     {
       value: "78.9%",
@@ -42,11 +45,11 @@ export const supportRag = {
     {
       value: "~82 ms",
       label: "retrieval per answered query",
-      detail: "$0 running cost",
+      detail: "$0 running cost · ~5.2k tokens per answered query",
     },
   ],
 
-  stack: ["Python", "FastAPI", "Qdrant", "BM25 / RRF", "Groq", "Docker", "AKS (dev)", "JWT"],
+  stack: ["Python", "FastAPI", "Gradio", "Qdrant", "BM25 / RRF", "bge-small", "Groq (gpt-oss)", "Qwen2.5", "Docker", "AKS (dev)", "JWT"],
 
   links: {
     repo: "https://github.com/Gaurav12341/SupportRAG",
@@ -76,10 +79,15 @@ export const supportRag = {
       why: "Evidence in context stayed the same while ranking quality dipped. Mixed result, so it stayed off.",
     },
     {
+      name: "Recursive chunking",
+      why: "Also tried alongside the other chunking variants; recall fell, so plain fixed-size chunks stayed.",
+    },
+    {
       name: "Agentic retry loop",
       why: "Built and measured on the dev set: no gain, plus extra tokens for every retried question. Switched off.",
     },
   ],
+  kept: "Kept: a stronger writer and a wider context window.",
 } as const;
 
 /* ── Pipeline diagram ─────────────────────────────────────────────────── */
@@ -98,20 +106,20 @@ export const supportRagDiagram: DiagramSpec = {
   nodes: [
     // offline ingestion (left → right)
     { id: "ingest", label: "Parse docs", sub: "~5,400 pages", kind: "source", x: 100, y: ROW1, note: "Kubernetes, PostgreSQL, Kafka and GitHub Actions docs." },
-    { id: "clean", label: "Clean", sub: "+ dedup", kind: "service", x: 300, y: ROW1, note: "Strips boilerplate and drops duplicate pages before anything is indexed." },
-    { id: "mask", label: "Mask", sub: "PII + secrets", kind: "guard", x: 500, y: ROW1, note: "Emails, keys and tokens are masked at ingestion, so they can never be retrieved." },
-    { id: "chunk", label: "Chunk", sub: "500 tok + access", kind: "service", x: 700, y: ROW1, note: "Fixed 500-token chunks, each tagged with an access level (public / internal / restricted)." },
+    { id: "clean", label: "Clean", sub: "+ exact dedup", kind: "service", x: 300, y: ROW1, note: "Cleans pages and drops exact duplicates before anything is indexed." },
+    { id: "mask", label: "Mask", sub: "PII + secrets", kind: "guard", x: 500, y: ROW1, note: "Regex masking of secrets and PII at ingestion, so they can never be retrieved." },
+    { id: "chunk", label: "Chunk", sub: "500 tok + access", kind: "service", x: 700, y: ROW1, note: "500-token chunks tagged with product, license and a 3-level access label." },
     { id: "embed", label: "Embed", sub: "bge-small", kind: "model", x: 900, y: ROW1, note: "Small, local embedding model. Free to run on CPU." },
-    { id: "index", label: "Index", sub: "Qdrant + BM25", kind: "db", x: 1100, y: ROW1, note: "Dense vectors in Qdrant plus a BM25 keyword index for exact error strings." },
+    { id: "index", label: "Index", sub: "Qdrant + BM25", kind: "db", x: 1100, y: ROW1, note: "bge-small vectors in Qdrant (with an embedding-model mismatch check) plus a BM25 keyword index." },
     // per question (right → left)
-    { id: "q", label: "Question", sub: "JWT user", kind: "human", x: 1100, y: ROW3, w: 150, note: "Signed-in user; their role decides which access levels they can read." },
-    { id: "fuse", label: "RRF fuse", sub: "+ access filter", kind: "service", x: 1100, y: ROW2, note: "Dense and BM25 searches both run with the access filter; reciprocal rank fusion merges them." },
+    { id: "q", label: "Question", sub: "JWT user", kind: "human", x: 1100, y: ROW3, w: 150, note: "JWT login (salted scrypt). A rule-based prompt-injection guard and a follow-up question rewriter run first; the user's role and license decide what they can read." },
+    { id: "fuse", label: "RRF fuse", sub: "+ access filter", kind: "service", x: 1100, y: ROW2, note: "The role/license access filter is applied to BOTH dense and BM25 searches before ranking; reciprocal rank fusion merges them. A poisoned-chunk scanner drops injected text." },
     { id: "expand", label: "Expand", sub: "parent section", kind: "service", x: 900, y: ROW2, note: "Hits are widened to their parent section so the writer sees full context." },
-    { id: "writer", label: "Writer", sub: "gpt-oss-120b", kind: "llm", x: 700, y: ROW2, note: "Groq-hosted. Schema-constrained output: steps, each with a citation." },
+    { id: "writer", label: "Writer", sub: "gpt-oss-120b", kind: "llm", x: 700, y: ROW2, note: "Groq gpt-oss-120b, JSON-schema constrained: returns kind, coverage and per-point citations." },
     { id: "failsafe", label: "Qwen2.5", sub: "local failsafe", kind: "llm", x: 700, y: ROW3, w: 150, note: "Local model on the failsafe path." },
-    { id: "check", label: "Claim check", sub: "gpt-oss-20b", kind: "llm", x: 500, y: ROW2, note: "A second model verifies every step against the cited passages. Unsupported steps are dropped." },
-    { id: "guard", label: "Guardrails", sub: "output safety", kind: "guard", x: 300, y: ROW2, note: "Masks secrets and flags dangerous commands before anything is shown." },
-    { id: "ui", label: "API + UI", sub: "FastAPI · Gradio", kind: "client", x: 100, y: ROW2, note: "Answer with citations and an evidence panel — or “No documented fix found.”" },
+    { id: "check", label: "Claim check", sub: "gpt-oss-20b", kind: "llm", x: 500, y: ROW2, note: "gpt-oss-20b labels every claim supported / partial / unsupported against the cited passages." },
+    { id: "guard", label: "Guardrails", sub: "output safety", kind: "guard", x: 300, y: ROW2, note: "Secret masking and destructive-command warnings before anything is shown." },
+    { id: "ui", label: "API + UI", sub: "FastAPI · Gradio", kind: "client", x: 100, y: ROW2, note: "Answer with clickable citations — or “No documented fix found.”" },
   ],
   edges: [
     { from: "ingest", to: "clean" },

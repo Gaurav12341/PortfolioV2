@@ -27,6 +27,8 @@ export type DiagramNode = {
   w?: number;
   /** Shown in the hover/tap tooltip and the screen-reader list. */
   note?: string;
+  /** Drawn faded + dashed (e.g. "internet" in the air-gapped variant). */
+  muted?: boolean;
 };
 
 export type EdgeStyle = "sync" | "async" | "dashed";
@@ -36,14 +38,30 @@ export type DiagramEdge = {
   to: string;
   label?: string;
   style?: EdgeStyle;
+  /** Human approval gate on this hop (drawn as a badge at the midpoint). */
+  gate?: boolean;
+  muted?: boolean;
 };
 
 export type DiagramStep = {
   title: string;
   body: string;
-  /** Node ids and edge ids (`from->to`) to highlight. */
+  /** Node ids, edge ids (`from->to`), lane ids (`lane:<id>`) or "rails". */
   highlight: string[];
 };
+
+/** Horizontal background band (swimlane / integration bus). */
+export type DiagramLane = {
+  id: string;
+  label: string;
+  sub?: string;
+  y: number;
+  h: number;
+  tone?: "lane" | "bus";
+};
+
+/** Vertical "uplink" rails with packets flowing upward (e.g. a bus feeding lanes). */
+export type DiagramRails = { xs: number[]; from: number; to: number };
 
 export type DiagramLayout = {
   viewBox: string;
@@ -61,8 +79,15 @@ export type DiagramSpec = {
   viewBox: string;
   nodeW?: number;
   nodeH?: number;
+  lanes?: DiagramLane[];
+  rails?: DiagramRails;
   /** Optional alternative layout used below the md breakpoint. */
   mobile?: DiagramLayout;
+  /**
+   * Without a mobile layout, small screens scroll the diagram horizontally
+   * at this minimum width (px) instead of shrinking the text to nothing.
+   */
+  minWidth?: number;
 };
 
 export const edgeId = (e: Pick<DiagramEdge, "from" | "to">) => `${e.from}->${e.to}`;

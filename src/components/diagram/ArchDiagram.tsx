@@ -65,6 +65,19 @@ export function ArchDiagram({ spec, activeStep = null, className, mini = false }
   const animated = !mini && !reduce;
   const step = activeStep != null ? spec.steps[activeStep] : null;
   const lit = React.useMemo(() => new Set(step?.highlight ?? []), [step]);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  // Small screens scroll wide diagrams horizontally: bring the active step's
+  // nodes into view when the step changes.
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (!el || !step || el.scrollWidth <= el.clientWidth + 4) return;
+    const xs = spec.nodes.filter((n) => lit.has(n.id)).map((n) => n.x);
+    if (!xs.length) return;
+    const vbW = Number(spec.viewBox.split(/\s+/)[2]);
+    const centre = ((Math.min(...xs) + Math.max(...xs)) / 2 / vbW) * el.scrollWidth;
+    el.scrollTo({ left: Math.max(0, centre - el.clientWidth / 2), behavior: reduce ? "auto" : "smooth" });
+  }, [step, lit, spec, reduce]);
 
   return (
     <div className={cn("relative", className)}>
@@ -74,7 +87,18 @@ export function ArchDiagram({ spec, activeStep = null, className, mini = false }
           <DiagramSvg spec={spec} layout="mobile" lit={lit} step={step} animated={animated} mini={mini} className="md:hidden" />
         </>
       ) : (
-        <DiagramSvg spec={spec} layout="desktop" lit={lit} step={step} animated={animated} mini={mini} />
+        <div
+          ref={scrollRef}
+          className={cn(spec.minWidth && !mini && "-mx-1 overflow-x-auto px-1 pb-2 md:mx-0 md:overflow-visible md:px-0 md:pb-0")}
+          data-no-swipe={spec.minWidth ? "" : undefined}
+        >
+          <div
+            className={spec.minWidth && !mini ? "min-w-[var(--diagram-min)] md:min-w-0" : undefined}
+            style={spec.minWidth && !mini ? ({ "--diagram-min": `${spec.minWidth}px` } as React.CSSProperties) : undefined}
+          >
+            <DiagramSvg spec={spec} layout="desktop" lit={lit} step={step} animated={animated} mini={mini} />
+          </div>
+        </div>
       )}
 
       {!mini && (
@@ -171,8 +195,8 @@ function DiagramSvg({
   const isLit = (id: string) => !step || lit.has(id);
 
   // Edges that carry packets: the highlighted ones, or every non-dashed edge in overview.
-  const packetEdges = spec.edges.filter((e) =>
-    step ? lit.has(edgeId(e)) : e.style !== "dashed",
+  const packetEdges = spec.edges.filter(
+    (e) => !e.muted && (step ? lit.has(edgeId(e)) : e.style !== "dashed"),
   );
 
   const hovered = hover ? placed.get(hover) : null;
@@ -201,6 +225,62 @@ function DiagramSvg({
           </marker>
         </defs>
 
+        {/* Lanes (swimlanes / integration bus) */}
+        {spec.lanes && (
+          <g>
+            {spec.lanes.map((ln) => {
+              const on = isLit(`lane:${ln.id}`) || spec.nodes.some((n) => lit.has(n.id) && n.y > ln.y && n.y < ln.y + ln.h);
+              const bus = ln.tone === "bus";
+              return (
+                <g key={ln.id} className="transition-opacity duration-500" style={{ opacity: !step || on ? 1 : 0.45 }}>
+                  <rect
+                    x={2}
+                    y={ln.y}
+                    width={vbW - 4}
+                    height={ln.h}
+                    rx={16}
+                    className={cn(bus ? "fill-brand/[0.06] stroke-brand/30" : "fill-foreground/[0.025] stroke-line")}
+                    strokeDasharray={bus ? "4 4" : undefined}
+                  />
+                  <text x={16} y={ln.y + 19} className={cn("font-mono", bus ? "fill-accent-text" : "fill-muted-foreground")} fontSize={10.5} fontWeight={600} letterSpacing={0.6}>
+                    {ln.label.toUpperCase()}
+                    {ln.sub && (
+                      <tspan className="fill-muted-foreground" fontWeight={400} letterSpacing={0}>
+                        {"  ·  "}
+                        {ln.sub}
+                      </tspan>
+                    )}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        )}
+
+        {/* Uplink rails (bus → lanes) */}
+        {spec.rails && (
+          <g className="transition-opacity duration-500" style={{ opacity: !step || lit.has("rails") ? 1 : 0.25 }}>
+            {spec.rails.xs.map((x, i) => (
+              <g key={x}>
+                <path
+                  id={`rail-${uid}-${i}`}
+                  d={`M ${x} ${spec.rails!.from} L ${x} ${spec.rails!.to}`}
+                  className="stroke-brand/35"
+                  strokeWidth={1}
+                  strokeDasharray="2 5"
+                />
+                {animated && (
+                  <circle r={2.5} className="fill-brand">
+                    <animateMotion dur="2.6s" begin={`-${(i * 0.65).toFixed(2)}s`} repeatCount="indefinite">
+                      <mpath href={`#rail-${uid}-${i}`} />
+                    </animateMotion>
+                  </circle>
+                )}
+              </g>
+            ))}
+          </g>
+        )}
+
         {/* Edges */}
         <g>
           {spec.edges.map((e) => {
@@ -210,14 +290,14 @@ function DiagramSvg({
             const id = edgeId(e);
             const d = edgePath(a, b, nodeH);
             const on = isLit(id);
-            const dashed = e.style === "async" || e.style === "dashed";
+            const dashed = e.style === "async" || e.style === "dashed" || e.muted;
             const mid = edgeMid(a, b, nodeH);
             const vert = anchors(a, b, nodeH).vertical;
             return (
               <g
                 key={id}
                 className="transition-opacity duration-500"
-                style={{ opacity: on ? 1 : 0.25 }}
+                style={{ opacity: e.muted ? 0.3 : on ? 1 : 0.25 }}
               >
                 <path
                   id={`p-${uid}-${id}`}
@@ -237,6 +317,12 @@ function DiagramSvg({
                       : undefined
                   }
                 />
+                {e.gate && (
+                  <g aria-hidden>
+                    <circle cx={mid.x} cy={mid.y} r={8.5} className={cn("fill-background stroke-brand")} strokeWidth={1.2} />
+                    <User x={mid.x - 5} y={mid.y - 5} width={10} height={10} className="text-accent-text" strokeWidth={2.4} />
+                  </g>
+                )}
                 {e.label && !mini && (
                   <text
                     x={vert ? mid.x + 10 : mid.x}
@@ -334,12 +420,12 @@ function NodeCard({
   const Icon = ICONS[n.kind];
   const x = n.cx - n.w / 2;
   const y = n.cy - h / 2;
-  const dashedBorder = n.kind === "human";
+  const dashedBorder = n.kind === "human" || n.muted;
 
   return (
     <g
       className={cn("transition-opacity duration-500", !mini && n.note && "cursor-pointer")}
-      style={{ opacity: on ? 1 : 0.25 }}
+      style={{ opacity: n.muted ? 0.35 : on ? 1 : 0.25 }}
       onPointerEnter={(e) => e.pointerType === "mouse" && onEnter()}
       onPointerLeave={(e) => e.pointerType === "mouse" && onLeave()}
       onClick={onTap}

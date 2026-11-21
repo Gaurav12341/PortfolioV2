@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowUpRight, Download, Menu, X } from "lucide-react";
 import { Logo } from "@/components/brand/logo";
@@ -20,10 +21,15 @@ const NAV_LINKS = [
 type SectionId = (typeof NAV_LINKS)[number]["id"];
 
 /** Tracks which nav section currently crosses the middle band of the viewport. */
-function useActiveSection(): SectionId | null {
+function useActiveSection(pathname: string): SectionId | null {
   const [active, setActive] = useState<SectionId | null>(null);
 
   useEffect(() => {
+    if (pathname !== "/") {
+      // Case-study pages live under Work.
+      setActive(pathname.startsWith("/work/") ? "work" : null);
+      return;
+    }
     const els = NAV_LINKS.map((l) => document.getElementById(l.id)).filter(
       (el): el is HTMLElement => !!el,
     );
@@ -41,7 +47,7 @@ function useActiveSection(): SectionId | null {
     );
     els.forEach((el) => io.observe(el));
     return () => io.disconnect();
-  }, []);
+  }, [pathname]);
 
   return active;
 }
@@ -64,7 +70,10 @@ function ResumeButton({ className, onClick }: { className?: string; onClick?: ()
 }
 
 const Navbar: React.FC = () => {
-  const active = useActiveSection();
+  const pathname = usePathname();
+  const router = useRouter();
+  const onHome = pathname === "/";
+  const active = useActiveSection(pathname);
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
 
@@ -79,6 +88,11 @@ const Navbar: React.FC = () => {
     e.preventDefault();
     const wasOpen = open;
     setOpen(false);
+    // On other routes (case studies) section anchors live on the home page.
+    if (!onHome) {
+      router.push(target === "#top" ? "/" : `/${target}`);
+      return;
+    }
     // Let the sheet release its scroll lock before scrolling.
     if (wasOpen) requestAnimationFrame(() => requestAnimationFrame(() => scrollToTarget(target)));
     else scrollToTarget(target);

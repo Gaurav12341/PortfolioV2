@@ -2,7 +2,7 @@ import Hero from "@/components/hero/hero";
 import CalBooking from "@/components/sections/home/cal-booking";
 import Achievements from "@/components/sections/home/achievements";
 import { ExperienceTimeline } from "@/components/sections/home/timeline-demo";
-import ProjectsShowcase from "@/components/sections/showreel";
+import WorkShowcase from "@/components/sections/work/work-showcase";
 import SupportRagSection from "@/components/sections/featured/supportrag-section";
 import CollabSec from "@/components/sections/home/collab-section";
 import AboutScrollSection from "@/components/sections/about/about-scroll-section";
@@ -17,14 +17,16 @@ export default function Home() {
     <div className="flex min-h-screen flex-col items-center justify-center">
       <Hero />
 
+      {/* Naruto-style scroll sequence (Phase 5 replaces its post-frame-27 blur) */}
+      <AboutScrollSection />
+
       {/* Work = featured project + work case studies */}
       <div id="work" className="w-full scroll-mt-[88px]">
         <SupportRagSection />
-        <ProjectsShowcase />
+        <WorkShowcase />
       </div>
 
       <section id="about" className="w-full">
-        <AboutScrollSection />
         <AboutSection />
       </section>
 

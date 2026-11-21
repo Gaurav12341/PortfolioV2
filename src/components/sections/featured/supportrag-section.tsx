@@ -39,6 +39,10 @@ export default function SupportRagSection() {
         </div>
         <Reveal delay={0.1}>
           <p className="mt-5 max-w-3xl text-lead text-muted-foreground">{p.summary}</p>
+          <p className="mt-3 max-w-3xl text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">Why I built it: </span>
+            {p.why.replace(/^Built to /, "to ")}
+          </p>
         </Reveal>
 
         {/* Video + metrics */}
@@ -86,6 +90,10 @@ export default function SupportRagSection() {
             ))}
           </Reveal>
         </div>
+
+        <Reveal>
+          <p className="mt-4 font-mono text-[11px] leading-relaxed text-muted-foreground">{p.evalNote}</p>
+        </Reveal>
 
         {/* Pipeline diagram */}
         <Reveal className="mt-8 rounded-3xl border border-line bg-surface-solid/60 p-4 backdrop-blur-sm md:p-8" amount={0.15}>
@@ -149,6 +157,7 @@ export default function SupportRagSection() {
                 aria-hidden
               />
             </summary>
+            <p className="px-5 pb-3 text-sm font-medium text-foreground md:px-7">{p.kept}</p>
             <ul className="grid gap-3 px-5 pb-5 md:grid-cols-2 md:px-7">
               {p.decisions.map((d) => (
                 <li key={d.name} className="rounded-2xl border border-line bg-background/60 p-4">
