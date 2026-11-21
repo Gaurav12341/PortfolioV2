@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useInView, useReducedMotion } from "motion/react";
+import { useInView } from "motion/react";
 import { DURATION, EASE_CSS } from "@/lib/motion";
 
 type SplitTextProps = {
@@ -11,19 +11,24 @@ type SplitTextProps = {
   className?: string;
   /** Seconds before the first line starts. */
   delay?: number;
-  /** Seconds between lines. */
+  /** Seconds between lines (or words, in `immediate` mode). */
   stagger?: number;
-  /** Reveal on mount instead of on scroll-into-view (use for the hero). */
+  /**
+   * Play on first paint with pure CSS keyframes, before React hydrates.
+   * Use for above-the-fold headings (the hero H1 is the LCP element).
+   * Staggers per word, since lines can't be measured before paint.
+   */
   immediate?: boolean;
 };
 
 /**
- * Line-by-line heading reveal. Words are measured after layout and grouped
- * by their rendered line, so wrapping stays natural at every width; each
- * line slides up from behind a mask.
+ * Line-by-line heading reveal: each line slides up from behind a mask.
  *
- * Screen readers get the plain text via aria-label (the split spans are
- * aria-hidden). Reduced motion renders plain text.
+ * Scroll mode measures words after layout and groups them by rendered line,
+ * so wrapping stays natural at every width. Screen readers get the plain
+ * text via aria-label (the split spans are aria-hidden). Reduced motion is
+ * handled by the global CSS media query (animations/transitions collapse to
+ * ~0ms), so server and client markup always match.
  */
 export function SplitText({
   text,
@@ -35,13 +40,12 @@ export function SplitText({
 }: SplitTextProps) {
   const Tag = as as React.ElementType;
   const ref = React.useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
   const inView = useInView(ref, { once: true, amount: 0.4 });
   const [lineOf, setLineOf] = React.useState<number[] | null>(null);
   const words = React.useMemo(() => text.split(/\s+/).filter(Boolean), [text]);
 
   React.useLayoutEffect(() => {
-    if (reduce) return;
+    if (immediate) return;
     const el = ref.current;
     if (!el) return;
 
@@ -65,32 +69,29 @@ export function SplitText({
     const ro = new ResizeObserver(measure);
     ro.observe(el);
     return () => ro.disconnect();
-  }, [reduce, words]);
-
-  if (reduce) {
-    return <Tag className={className}>{text}</Tag>;
-  }
-
-  const play = immediate || inView;
+  }, [immediate, words]);
 
   return (
     <Tag ref={ref} className={className} aria-label={text}>
       {words.map((word, i) => {
-        const line = lineOf?.[i] ?? 0;
+        const style: React.CSSProperties = immediate
+          ? {
+              animation: `rise-in ${DURATION.slow}s ${EASE_CSS} ${delay + i * stagger}s both`,
+            }
+          : {
+              transform: inView ? "translateY(0)" : "translateY(110%)",
+              transition: `transform ${DURATION.slow}s ${EASE_CSS} ${
+                delay + (lineOf?.[i] ?? 0) * stagger
+              }s`,
+            };
+
         return (
           <React.Fragment key={`${word}-${i}`}>
             <span
               aria-hidden
-              className="-mb-[0.1em] inline-block overflow-hidden pb-[0.1em] align-bottom"
+              className="-mb-[0.12em] inline-block overflow-hidden pb-[0.12em] align-bottom"
             >
-              <span
-                data-word
-                className="inline-block will-change-transform"
-                style={{
-                  transform: play ? "translateY(0)" : "translateY(110%)",
-                  transition: `transform ${DURATION.slow}s ${EASE_CSS} ${delay + line * stagger}s`,
-                }}
-              >
+              <span data-word className="inline-block will-change-transform" style={style}>
                 {word}
               </span>
             </span>

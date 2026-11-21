@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { motion, useReducedMotion, type Variants } from "motion/react";
+import { motion, type Variants } from "motion/react";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 import { DURATION, EASE, RISE } from "@/lib/motion";
 
 type Tag = "div" | "section" | "ul" | "ol" | "li" | "span" | "p" | "header" | "footer";
@@ -39,7 +40,7 @@ export function Reveal({
   as = "div",
   amount = 0.2,
 }: RevealProps) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
 
   if (reduce) {
     const Static = as as React.ElementType;
@@ -74,7 +75,7 @@ export function RevealItem({
   className,
   as = "div",
 }: Pick<RevealProps, "children" | "className" | "as">) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
 
   if (reduce) {
     const Static = as as React.ElementType;

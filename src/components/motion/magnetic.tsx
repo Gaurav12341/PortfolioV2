@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { motion, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { motion, useMotionValue, useSpring } from "motion/react";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 type MagneticProps = {
   children: React.ReactNode;
@@ -16,7 +17,7 @@ type MagneticProps = {
  */
 export function Magnetic({ children, className = "inline-block", strength = 6 }: MagneticProps) {
   const ref = React.useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [finePointer, setFinePointer] = React.useState(false);
 
   const x = useMotionValue(0);

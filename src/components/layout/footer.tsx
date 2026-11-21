@@ -182,7 +182,7 @@ export default function CreativeFooter() {
               Sitemap
             </h3>
             {[
-              { label: "Home", href: "#hero" },
+              { label: "Home", href: "#top" },
               { label: "Projects", href: "#work" },
               { label: "Experience", href: "#experience" },
               { label: "About", href: "#about" },

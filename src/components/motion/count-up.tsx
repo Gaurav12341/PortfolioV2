@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { useInView, useReducedMotion } from "motion/react";
+import { useInView } from "motion/react";
+import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 
 type CountUpProps = {
   /**
@@ -24,7 +25,7 @@ const NUMBER = /\d+(?:\.\d+)?/;
 export function CountUp({ value, duration = 1.4, className }: CountUpProps) {
   const ref = React.useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.6 });
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionSafe();
   const [display, setDisplay] = React.useState(value);
 
   React.useEffect(() => {

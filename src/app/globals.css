@@ -174,6 +174,40 @@
   color: var(--accent-fg);
 }
 
+/* ── Entrance keyframes (CSS so they run before hydration) ─────────────── */
+@keyframes rise-in {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(250%);
+  }
+}
+/* Usage: <div class="anim-fade-up" style="--d: 0.2s"> */
+.anim-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0s);
+}
+
 /* ── Lenis (recommended base styles) ───────────────────────────────────── */
 html.lenis,
 html.lenis body {

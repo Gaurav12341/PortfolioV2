@@ -1,51 +1,30 @@
-"use client";
-
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import AboutMe from "@/components/sections/about/about-me";
+import Hero from "@/components/hero/hero";
 import CalBooking from "@/components/sections/home/cal-booking";
 import Achievements from "@/components/sections/home/achievements";
 import { ExperienceTimeline } from "@/components/sections/home/timeline-demo";
-import Preloader from "@/components/common/preloader";
 import ProjectsShowcase from "@/components/sections/showreel";
 import CollabSec from "@/components/sections/home/collab-section";
 import AboutScrollSection from "@/components/sections/about/about-scroll-section";
 import AboutSection from "@/components/sections/about/about-section";
 
+/**
+ * Server component. No preloader: the hero text is in the initial HTML and
+ * is the LCP element. Heavy sections hydrate on their own.
+ */
 export default function Home() {
-  // The Preloader owns the (60fps) load-progress state internally so those
-  // updates never re-render this heavy page tree. It just tells us when it's
-  // done, and we drop it.
-  const [isLoading, setIsLoading] = useState(true);
-
-  const handleLoaded = () => {
-    setIsLoading(false);
-    document.body.style.cursor = "default";
-    window.scrollTo(0, 0);
-  };
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center scroll-smooth">
-      <AnimatePresence mode="wait">
-        {isLoading && <Preloader onComplete={handleLoaded} />}
-      </AnimatePresence>
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <Hero />
 
-      {/*About Me is Hero Section */}
-      <section id="hero" className="w-full">
-        <AboutMe />
-      </section>
-
-      {/* Projects Section — id="work" is set on the section inside ProjectsShowcase */}
+      {/* Projects: id="work" is set on the section inside ProjectsShowcase */}
       <ProjectsShowcase />
 
-      {/* About Scroll Section */}
-      <section id="about" className="">
+      <section id="about" className="w-full">
         <AboutScrollSection />
         <AboutSection />
       </section>
 
-      {/* Experience Section */}
-      <section id="experience" className="w-full scroll-mt-[84px]">
+      <section id="experience" className="w-full scroll-mt-[88px]">
         <ExperienceTimeline />
       </section>
 
@@ -53,8 +32,7 @@ export default function Home() {
 
       <Achievements />
 
-      {/* Contact Section */}
-      <section id="contact" className="w-full scroll-mt-[84px]">
+      <section id="contact" className="w-full scroll-mt-[88px]">
         <CalBooking />
       </section>
     </div>
