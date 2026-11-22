@@ -1,370 +1,94 @@
-"use client";
+import { CountUp, Reveal, RevealItem } from "@/components/motion";
+import { about } from "@/content/about";
+import { AboutDepth } from "./about-depth";
+import { StackBand } from "./stack-band";
 
-import React, { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform, useInView } from "motion/react";
-
-// ─── Animated counter hook ────────────────────────────────────────────────────
-function useCountUp(target: number, inView: boolean, duration = 1800) {
-  const [value, setValue] = useState(0);
-  const rafRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!inView) return;
-    const start = performance.now();
-
-    const tick = (now: number) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      // Cubic ease-out
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setValue(Math.round(eased * target));
-      if (progress < 1) rafRef.current = requestAnimationFrame(tick);
-    };
-
-    rafRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
-    };
-  }, [inView, target, duration]);
-
-  return value;
-}
-
-// ─── Metric card ──────────────────────────────────────────────────────────────
-interface MetricCardProps {
-  prefix?: string;
-  value: number;
-  suffix?: string;
-  label: string;
-  description: string;
-  highlight?: boolean;
-  delay?: number;
-}
-
-const MetricCard = ({
-  prefix = "",
-  value,
-  suffix = "",
-  label,
-  description,
-  highlight = false,
-  delay = 0,
-}: MetricCardProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-  const count = useCountUp(value, inView, 1800);
+/**
+ * About (PHASES.md · Phase 6). Opens on the layered full-body portrait with
+ * the headline, then story + numbers, principles + recognition, and the
+ * grouped stack full width. All copy lives in content/about.ts.
+ */
+export default function AboutSection() {
+  const a = about;
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8, delay, ease: [0.16, 1, 0.3, 1] }}
-      className={`group relative flex flex-col gap-3 p-8 rounded-2xl border overflow-hidden transition-all duration-500 cursor-default ${
-        highlight
-          ? "border-primary/40 bg-primary/5 hover:bg-primary/10"
-          : "border-border bg-card hover:border-primary/30 hover:bg-muted/40"
-      }`}
-    >
-      {highlight && (
-        <motion.div
-          animate={{ opacity: [0.25, 0.55, 0.25] }}
-          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 bg-linear-to-br from-primary/20 via-primary/5 to-transparent pointer-events-none"
-        />
-      )}
-      <div className="absolute -bottom-8 -right-8 w-28 h-28 rounded-full border border-border opacity-15 group-hover:scale-[2] transition-transform duration-700" />
-      <div className="relative z-10">
-        <div
-          className={`font-black tracking-tighter leading-none mb-1 ${
-            highlight
-              ? "text-primary text-7xl md:text-8xl"
-              : "text-foreground text-6xl md:text-7xl"
-          }`}
-        >
-          {prefix}
-          {count}
-          {suffix}
-        </div>
-        <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">
-          {label}
-        </p>
-        <div
-          className={`h-px w-10 mb-3 ${highlight ? "bg-primary/40" : "bg-border"}`}
-        />
-        <p className="text-sm text-muted-foreground leading-relaxed max-w-sm">
-          {description}
-        </p>
-      </div>
-    </motion.div>
-  );
-};
+    <div className="relative w-full pb-8 md:pb-12">
+      <AboutDepth />
 
-// ─── Main component ────────────────────────────────────────────────────────────
-const AboutSection = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "center center"],
-  });
-
-  const imageY = useTransform(scrollYProgress, [0, 1], [50, -30]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [0.94, 1.02]);
-
-  // Section-level entrance: panel slides up with subtle clip-path wipe
-  const sectionY = useTransform(scrollYProgress, [0, 0.25], [40, 0]);
-  const sectionOpacity = useTransform(scrollYProgress, [0, 0.2], [0, 1]);
-
-  return (
-    <motion.section
-      ref={sectionRef}
-      style={{ y: sectionY, opacity: sectionOpacity }}
-      className="relative w-full py-28 md:py-40 bg-background overflow-hidden"
-    >
-      {/* Subtle dot-grid texture */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "radial-gradient(hsl(var(--foreground)) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-        }}
-      />
-
-      {/* Ambient glow behind metrics panel */}
-      <motion.div
-        aria-hidden
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 1.8 }}
-        className="pointer-events-none absolute right-0 top-1/4 w-150 h-150 rounded-full bg-primary/10 blur-[140px]"
-      />
-
-      <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-20 items-start">
-          {/* ══════════ LEFT — Identity ══════════ */}
-          <div className="lg:col-span-5 flex flex-col gap-10">
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-              className="inline-flex items-center gap-2.5 w-fit px-4 py-1.5 rounded-full border border-primary/30 bg-primary/5 text-xs font-mono uppercase tracking-widest text-primary"
-            >
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-              </span>
-              About
-            </motion.div>
-
-            {/* Profile image with parallax */}
-            <motion.div
-              style={{ y: imageY, scale: imageScale }}
-              className="relative w-full aspect-3/4 max-w-85 mx-auto lg:mx-0 overflow-hidden rounded-3xl"
-            >
-              {/* Border frame */}
-              <div className="absolute -inset-px rounded-3xl border border-primary/15 z-20 pointer-events-none" />
-
-              {/* Placeholder until the real portrait lands (Phase 5/6). Never use a stock photo here. */}
-              <div
-                aria-hidden
-                className="absolute inset-0 flex items-center justify-center bg-surface-solid"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
-                  backgroundSize: "24px 24px",
-                }}
-              >
-                <span className="flex items-center gap-2 font-mono text-7xl font-semibold tracking-tighter text-foreground/80">
-                  gr
-                  <span className="inline-block h-14 w-6 rounded-sm bg-brand" />
-                </span>
-              </div>
-
-              {/* Bottom fade */}
-              <div className="absolute bottom-0 left-0 right-0 h-2/5 bg-linear-to-t from-background via-background/50 to-transparent z-10" />
-
-              {/* Availability pill */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.5, duration: 0.5 }}
-                className="absolute bottom-5 left-5 right-5 z-20 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-background/85 backdrop-blur-md border border-border text-sm font-medium"
-              >
-                <span className="relative flex h-2 w-2 shrink-0">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-500 opacity-75" />
-                  <span className="relative flex h-2 w-2 rounded-full bg-green-500" />
-                </span>
-                Open to Opportunities
-              </motion.div>
-            </motion.div>
-
-            {/* Name & designation */}
-            <div className="space-y-3">
-              <motion.h2
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.7,
-                  delay: 0.1,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="text-4xl md:text-5xl font-black tracking-tighter leading-none"
-              >
-                Gaurav Raj
-              </motion.h2>
-
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: 0.2 }}
-                className="font-mono text-sm uppercase tracking-widest text-primary"
-              >
-                Software Engineer I, Honeywell
-              </motion.p>
-
-              <motion.p
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, delay: 0.3 }}
-                className="text-muted-foreground text-[15px] leading-relaxed max-w-xs"
-              >
-                Backend Software Engineer building distributed systems and
-                cloud platforms — with hands-on experience shipping
-                production AI/RAG systems on top of them.
-              </motion.p>
-            </div>
-
-            {/* Expertise tags */}
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="flex flex-wrap gap-2"
-            >
-              {[
-                "Distributed Systems",
-                "Cloud Platforms",
-                "Microservices",
-                "RAG & AI Agents",
-                "CI/CD",
-              ].map((tag) => (
-                <span
-                  key={tag}
-                  className="px-5 py-2 rounded border border-border bg-muted text-xs font-mono uppercase tracking-wider text-muted-foreground hover:border-primary/40 hover:text-foreground transition-colors duration-300 cursor-default"
-                >
-                  {tag}
-                </span>
+      <div className="container-page mt-16 md:mt-24">
+        {/* Story + numbers */}
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          <div className="lg:col-span-7">
+            <Reveal className="max-w-[62ch] space-y-5">
+              <p className="text-lead text-foreground">{a.story[0]}</p>
+              {a.story.slice(1).map((p) => (
+                <p key={p} className="text-base leading-relaxed text-muted-foreground md:text-[17px]">
+                  {p}
+                </p>
               ))}
-            </motion.div>
-
-            {/* Personal story */}
-            <motion.p
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="max-w-md border-l-2 border-primary/30 pl-4 text-sm text-muted-foreground leading-relaxed"
-            >
-              I got into software out of curiosity — how one line of code
-              could ripple into everything from how a game responds to your
-              input to how a website renders on screen. That curiosity turned
-              into a habit: brainstorm, debate the right call, ship it, and
-              learn from what happens next. The principle I hold onto is
-              simple — ship code that best solves the problem, and let
-              developing and learning feed each other instead of treating
-              them as separate steps.
-            </motion.p>
+            </Reveal>
+            <Reveal delay={0.1}>
+              <p className="mt-8 inline-flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-2xl border border-line bg-surface-solid/70 px-4 py-3 text-sm">
+                <span className="font-mono text-xs text-accent-text">Currently</span>
+                <span className="text-foreground">{a.currently}</span>
+              </p>
+            </Reveal>
           </div>
 
-          {/* ══════════ RIGHT — Metrics ══════════ */}
-          <div className="lg:col-span-7 flex flex-col justify-center gap-10">
-            {/* Headline */}
-            <div>
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-                className="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-4"
-              >
-                By the numbers
-              </motion.p>
+          <Reveal
+            as="ul"
+            stagger={0.07}
+            className="grid grid-cols-2 gap-x-6 gap-y-8 self-start border-t border-line pt-8 lg:col-span-5 lg:mt-1.5"
+          >
+            {a.stats.map((s) => (
+              <RevealItem as="li" key={s.label}>
+                <p className="flex flex-wrap items-baseline gap-x-1.5 font-mono font-semibold tracking-tight">
+                  {"from" in s && (
+                    <span className="text-base font-normal text-muted-foreground line-through decoration-muted-foreground/50">
+                      {s.from}
+                    </span>
+                  )}
+                  <CountUp value={s.value} className="text-3xl text-foreground lg:text-[34px]" />
+                  {"unit" in s && <span className="text-lg text-foreground">{s.unit}</span>}
+                </p>
+                <p className="mt-2 text-sm leading-snug text-muted-foreground">{s.label}</p>
+              </RevealItem>
+            ))}
+          </Reveal>
+        </div>
 
-              <motion.h3
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.8,
-                  delay: 0.1,
-                  ease: [0.16, 1, 0.3, 1],
-                }}
-                className="text-4xl md:text-5xl lg:text-[3.5rem] font-black tracking-tighter leading-[0.93] uppercase"
-              >
-                Results that
-                <br />
-                <span className=" text-primary">Speak Loudly.</span>
-              </motion.h3>
-            </div>
+        {/* Principles + recognition */}
+        <div className="mt-20 grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
+          <Reveal className="lg:col-span-7">
+            <h3 className="text-h3 font-semibold">How I work</h3>
+            <ol className="mt-5 divide-y divide-line border-y border-line">
+              {a.principles.map((p) => (
+                <li key={p.title} className="grid gap-1 py-4 sm:grid-cols-[13rem_1fr] sm:gap-6">
+                  <span className="font-medium text-foreground">{p.title}</span>
+                  <span className="text-sm leading-relaxed text-muted-foreground md:text-base">{p.body}</span>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
 
-            {/* Metric cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <MetricCard
-                value={2}
-                suffix="+ yrs"
-                label="Professional Experience"
-                description="Building backend systems and cloud platforms at Honeywell — from ambiguous problem discovery through production deployment."
-                delay={0.15}
-              />
-
-              <MetricCard
-                value={50}
-                suffix="+"
-                label="Healthcare Networks"
-                description="Enterprise and air-gapped, on-prem deployment platforms running in production across 50+ networks."
-                delay={0.25}
-              />
-
-              {/* Deployment speedup — full-width highlighted */}
-              <div className="sm:col-span-2">
-                <MetricCard
-                  value={67}
-                  suffix="%"
-                  label="Faster Deployments"
-                  description="Cut multi-service deployment time from ~2 hours to ~40 minutes by building a resumable, fault-tolerant .NET 8 orchestration platform."
-                  highlight
-                  delay={0.35}
-                />
-              </div>
-            </div>
-
-            {/* Footnote */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.7, delay: 0.5 }}
-              className="text-xs font-mono text-muted-foreground/50 uppercase tracking-widest border-t border-border pt-6"
-            >
-              Numbers reflect real production outcomes at Honeywell — not
-              estimates.
-            </motion.p>
-          </div>
+          <Reveal className="lg:col-span-5" delay={0.05}>
+            <h3 className="text-h3 font-semibold">Recognition</h3>
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {a.recognition.map((r) => (
+                <li
+                  key={r}
+                  className="rounded-xl border border-line bg-surface-solid/70 px-3.5 py-1.5 text-sm text-foreground"
+                >
+                  {r}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-8 text-sm leading-relaxed text-muted-foreground">{a.offKeyboard}</p>
+          </Reveal>
         </div>
       </div>
-    </motion.section>
-  );
-};
 
-export default AboutSection;
+      <StackBand groups={a.stack} />
+    </div>
+  );
+}

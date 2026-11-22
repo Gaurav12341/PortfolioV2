@@ -94,10 +94,15 @@ const CalBooking = () => {
           style={{ y: yImage }}
           className="relative z-0 mx-auto w-full max-w-[380px] lg:absolute lg:inset-y-4 lg:right-4 lg:mx-0 lg:w-auto lg:max-w-none"
         >
+          {/* Phase 7 restyles this section; the copyrighted art is gone already. */}
           <img
-            src={"/ichigo2.png"}
-            alt="Profile photo"
-            className="mx-auto block h-auto w-full object-contain lg:mx-0 lg:h-full lg:w-auto"
+            src="/images/portrait-anime.webp"
+            alt="Illustrated portrait of Gaurav Raj"
+            width={800}
+            height={1200}
+            loading="lazy"
+            decoding="async"
+            className="mx-auto block h-auto w-full rounded-3xl border border-line object-cover lg:mx-0 lg:h-full lg:w-auto"
           />
         </motion.div>
 
