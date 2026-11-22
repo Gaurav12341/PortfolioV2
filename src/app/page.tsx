@@ -1,9 +1,8 @@
 import Hero from "@/components/hero/hero";
-import CalBooking from "@/components/sections/home/cal-booking";
+import ContactSection from "@/components/sections/contact/contact-section";
 import { ExperienceTimeline } from "@/components/sections/about/experience-timeline";
 import WorkShowcase from "@/components/sections/work/work-showcase";
 import SupportRagSection from "@/components/sections/featured/supportrag-section";
-import CollabSec from "@/components/sections/home/collab-section";
 import AboutScrollSection from "@/components/sections/about/about-scroll-section";
 import AboutSection from "@/components/sections/about/about-section";
 
@@ -33,10 +32,8 @@ export default function Home() {
         <ExperienceTimeline />
       </section>
 
-      <CollabSec />
-
-      <section id="contact" className="w-full scroll-mt-[88px]">
-        <CalBooking />
+      <section id="contact" aria-label="Contact" className="w-full scroll-mt-[88px]">
+        <ContactSection />
       </section>
     </div>
   );

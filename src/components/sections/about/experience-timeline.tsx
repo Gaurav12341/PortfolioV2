@@ -26,8 +26,8 @@ export function ExperienceTimeline() {
               Experience
             </h2>
             <p className="mt-4 max-w-sm text-muted-foreground">
-              Two years of backend work at Honeywell, from an AKS internship to owning deployment tooling across 50+
-              healthcare networks.
+              Two years of backend and AI work at Honeywell: .NET services across 50+ healthcare networks, and the RAG
+              and agent tools built on top of them.
             </p>
           </Reveal>
         </div>
@@ -42,7 +42,7 @@ export function ExperienceTimeline() {
           />
 
           {timeline.map((t) => (
-            <li key={t.when} className="relative pb-14 pl-10 last:pb-0">
+            <li key={t.when} className="relative pb-16 pl-10 last:pb-0">
               <span
                 aria-hidden
                 className="absolute left-0 top-1.5 size-[11px] rounded-full border-2 border-brand bg-background"
@@ -52,17 +52,28 @@ export function ExperienceTimeline() {
                 <h3 className="mt-2 text-h3 font-semibold">{t.role}</h3>
                 <p className="mt-0.5 text-sm font-medium text-accent-text">{t.org}</p>
                 <p className="mt-4 max-w-[62ch] leading-relaxed text-muted-foreground">{t.body}</p>
-                {t.highlights.length > 0 && (
-                  <ul className="mt-5 grid gap-2">
-                    {t.highlights.map((h) => (
-                      <li
-                        key={h}
-                        className="w-fit rounded-xl border border-line bg-surface-solid/70 px-3.5 py-2 font-mono text-[13px] text-foreground"
-                      >
-                        {h}
-                      </li>
-                    ))}
-                  </ul>
+
+                {t.groups.map((g, gi) => (
+                  <div key={g.title ?? gi} className="mt-7">
+                    {g.title && <h4 className="font-mono text-xs text-accent-text">{g.title}</h4>}
+                    <ul className={`${g.title ? "mt-3" : ""} max-w-[66ch] divide-y divide-line border-y border-line`}>
+                      {g.points.map((p) => (
+                        <li key={p.text} className="py-3 text-[15px] leading-relaxed text-muted-foreground">
+                          {p.figure && (
+                            <span className="mr-2 font-mono font-semibold tracking-tight text-foreground">{p.figure}</span>
+                          )}
+                          {p.text}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+
+                {t.stack.length > 0 && (
+                  <p className="mt-5 font-mono text-xs leading-relaxed text-muted-foreground">
+                    <span className="sr-only">Stack: </span>
+                    {t.stack.join(" · ")}
+                  </p>
                 )}
               </Reveal>
             </li>

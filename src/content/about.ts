@@ -118,38 +118,79 @@ export const about = {
     "Off the keyboard: badminton (2nd runner-up, district under-18), singing and guitar, anime, and volunteering with NGOs.",
 } as const;
 
-/** Experience timeline (Phase 6.5). Dates confirmed by Gaurav (Nov 2026). */
-export const timeline = [
+/**
+ * Experience timeline (Phase 6.5). Dates confirmed by Gaurav (Nov 2026).
+ * Facts from aboutme.md §5 + PHASES.md §11. NDA rule: no internal product or
+ * module names. Each point may lead with a `figure`, shown bold in mono.
+ */
+type Point = { figure?: string; text: string };
+type Role = {
+  when: string;
+  org: string;
+  role: string;
+  body: string;
+  groups: { title?: string; points: Point[] }[];
+  stack: string[];
+};
+
+export const timeline: Role[] = [
   {
     when: "Aug 2024 - now",
     org: "Honeywell",
     role: "Software Engineer I",
-    body: "Own .NET 8 services and deployment tooling across 50+ healthcare networks. Built the production RAG assistant for ~150 field engineers and the agentic PDLC pipeline.",
-    highlights: [
-      "Deploys ~2 h → 40 min (67%) across 15+ services, with resumable stages",
-      "40%+ availability through Kafka orchestration and zero-downtime updates",
-      "Release cycles cut 50%, ~80 engineering hours saved a month",
+    body: "Backend services in .NET 8 for 50+ healthcare networks, many of them on-prem or air-gapped, and the AI systems that run on top of them.",
+    groups: [
+      {
+        title: "Backend",
+        points: [
+          { figure: "67%", text: "faster deploys (~2 h to 40 min): a .NET 8 platform orchestrating 15+ services, with resumable stages for slow or interrupted on-prem links" },
+          { figure: "40%+", text: "higher availability through Kafka orchestration, zero-downtime updates and service recovery" },
+          { figure: "50%", text: "shorter release cycles and 60% less manual effort from CI/CD automation, ~80 engineering hours saved a month" },
+          { figure: "20s→<3s", text: "on a 50K-record analytics dashboard, with GraphQL filtering, pagination and Redis caching behind .NET REST and gRPC services" },
+          { text: "Rebuilt Keycloak SSO as an automated .NET workflow, shipped with zero known release defects" },
+        ],
+      },
+      {
+        title: "AI",
+        points: [
+          { figure: "150", text: "field engineers on a RAG assistant that runs in the cloud and air-gapped (Vertex AI / Gemini, Ollama, pgvector, FAISS, Chroma), answers in under 5 s" },
+          { text: "NL-to-SQL agent (Python, FastAPI, PostgreSQL, few-shot prompting) so non-technical users pull their own KPI reports" },
+          { figure: "~$6K", text: "saved in one release by an agentic PDLC pipeline: requirements to Playwright-tested code, wired to Jira and GitHub over MCP, now used by several teams" },
+        ],
+      },
     ],
+    stack: [".NET 8", "C#", "Kafka", "PostgreSQL", "Redis", "Kubernetes", "Python", "FastAPI", "React"],
   },
   {
     when: "Jan - Jul 2024",
     org: "Honeywell",
     role: "Software Engineer Intern",
-    body: "Tuned Dockerized services and Kubernetes scaling on AKS for 1M+ daily requests, and added Prometheus monitoring across 5+ microservices. Earned the Dashing Debut award.",
-    highlights: [],
+    body: "Backend services on Azure AKS: scaling, monitoring and delivery. Earned the Dashing Debut award.",
+    groups: [
+      {
+        points: [
+          { figure: "1M+", text: "daily requests kept steady by tuning Dockerized services and Kubernetes scaling" },
+          { figure: "5+", text: "microservices brought under Prometheus monitoring, plus incident resolution on them" },
+          { text: "GitHub Actions CI/CD for the same services" },
+        ],
+      },
+    ],
+    stack: ["Docker", "Kubernetes", "Azure AKS", "Prometheus", "GitHub Actions"],
   },
   {
     when: "Feb - May 2023",
     org: "Corizo",
     role: "Web Development Intern",
     body: "Built a real-time full-stack app with Node.js, MongoDB and REST APIs, with a responsive UI and a Git-based delivery workflow.",
-    highlights: [],
+    groups: [],
+    stack: [],
   },
   {
     when: "2020 - 2024",
     org: "SRM Institute of Science & Technology",
     role: "B.Tech, Computer Science & Engineering",
     body: "Software Engineering specialisation. CGPA 9.44 / 10.",
-    highlights: [],
+    groups: [],
+    stack: [],
   },
-] as const;
+];

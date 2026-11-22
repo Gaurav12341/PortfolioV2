@@ -4,6 +4,7 @@ import "./globals.css";
 import { BASE_URL, OG_IMAGE } from "@/lib/constants";
 import LenisWrapper from "@/providers/lenis-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { AppToaster } from "@/components/common/app-toaster";
 import FooterSection from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
 import StructuredData from "@/components/common/structured-data";
@@ -144,6 +145,7 @@ export default function RootLayout({
             <main id="main">{children}</main>
             <FooterSection />
           </LenisWrapper>
+          <AppToaster />
         </ThemeProvider>
       </body>
     </html>

@@ -2,12 +2,11 @@
 
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
-import { useRef, useEffect } from "react";
-import { FaGithub, FaLinkedin, FaArrowRight } from "react-icons/fa6";
+import { useRef } from "react";
+import { FaGithub, FaLinkedin } from "react-icons/fa6";
 import { SiLeetcode } from "react-icons/si";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { getCalApi } from "@calcom/embed-react";
-import { CAL_USERNAME, CONTACT_EMAIL } from "@/lib/constants";
+import { CollabMark } from "@/components/common/collab-mark";
 
 const SocialLink = ({
   href,
@@ -74,26 +73,6 @@ const MagneticButton = ({ children }: { children: React.ReactNode }) => {
 export default function CreativeFooter() {
   const currentYear = new Date().getFullYear();
 
-  useEffect(() => {
-    if (!CAL_USERNAME) return;
-    (async function () {
-      const cal = await getCalApi({ namespace: "30min" });
-      cal("ui", { hideEventTypeDetails: false, layout: "month_view" });
-    })();
-  }, []);
-
-  const handleLetsTalkClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!CAL_USERNAME) {
-      window.location.href = `mailto:${CONTACT_EMAIL}`;
-      return;
-    }
-    const cal = await getCalApi({ namespace: "30min" });
-    cal("modal", {
-      calLink: `${CAL_USERNAME}/30min`,
-    });
-  };
-
   return (
     <footer className="relative w-full overflow-hidden border-t pt-20 md:pt-32 pb-10">
       {/* --- BACKGROUND EFFECTS --- */}
@@ -138,15 +117,7 @@ export default function CreativeFooter() {
           </div>
 
           <MagneticButton>
-            <button
-              onClick={handleLetsTalkClick}
-              className="group relative cursor-pointer flex h-32 w-32 items-center justify-center rounded-full bg-foreground text-background transition-colors hover:bg-primary md:h-40 md:w-40"
-            >
-              <span className="absolute z-10 text-lg font-medium group-hover:opacity-0 transition-opacity duration-300">
-                Let&apos;s Talk
-              </span>
-              <FaArrowRight className="absolute z-10 size-8 -translate-x-10 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100 text-white" />
-            </button>
+            <CollabMark />
           </MagneticButton>
         </div>
 
