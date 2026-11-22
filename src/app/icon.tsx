@@ -1,33 +1,19 @@
 import { ImageResponse } from "next/og";
+import { BrandMark } from "./_brand/mark";
 
-export const size = { width: 64, height: 64 };
-export const contentType = "image/png";
+/** Favicon set from the monogram: 32 for tabs, 192 and 512 for the manifest. */
+const SIZES = { small: 32, medium: 192, large: 512 } as const;
 
-/** Favicon: the "gr▌" monogram from components/brand/logo.tsx. */
-export default function Icon() {
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 3,
-          background: "#0b0a0d",
-          borderRadius: 14,
-          color: "#f2eef0",
-          fontSize: 30,
-          fontWeight: 700,
-          letterSpacing: -1.5,
-          fontFamily: "monospace",
-        }}
-      >
-        gr
-        <div style={{ width: 9, height: 24, background: "#fb3b64", borderRadius: 2, marginTop: 4 }} />
-      </div>
-    ),
-    { ...size },
-  );
+export function generateImageMetadata() {
+  return Object.entries(SIZES).map(([id, s]) => ({
+    id,
+    size: { width: s, height: s },
+    contentType: "image/png",
+  }));
+}
+
+export default async function Icon({ id }: { id: Promise<string> | string }) {
+  const key = (await id) as keyof typeof SIZES;
+  const s = SIZES[key] ?? 32;
+  return new ImageResponse(<BrandMark size={s} />, { width: s, height: s });
 }

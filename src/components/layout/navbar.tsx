@@ -9,6 +9,7 @@ import { Logo } from "@/components/brand/logo";
 import { ThemeToggle } from "./theme-toggle";
 import { getLenis, scrollToTarget } from "@/lib/scroll";
 import { CONTACT_EMAIL, RESUME_PATH, SOCIAL_LINKS } from "@/lib/constants";
+import { trackResumeDownload } from "@/lib/analytics";
 import { DURATION, EASE } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -57,7 +58,10 @@ function ResumeButton({ className, onClick }: { className?: string; onClick?: ()
     <a
       href={RESUME_PATH}
       download="Gaurav-Raj-Resume.pdf"
-      onClick={onClick}
+      onClick={() => {
+        trackResumeDownload("nav");
+        onClick?.();
+      }}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-sm font-medium text-brand-fg transition-[filter,transform] hover:brightness-110 active:scale-[0.97]",
         className,

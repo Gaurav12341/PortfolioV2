@@ -14,6 +14,7 @@ import { Magnetic, Reveal, RevealItem, SplitText } from "@/components/motion";
 import { contact } from "@/content/contact";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 import { CAL_USERNAME, CONTACT_EMAIL, RESUME_PATH, SOCIAL_LINKS } from "@/lib/constants";
+import { trackResumeDownload } from "@/lib/analytics";
 import { CalInline } from "./cal-inline";
 
 const linkedin = SOCIAL_LINKS.find((l) => l.name === "LinkedIn")!.href;
@@ -164,7 +165,8 @@ export default function ContactSection() {
                 <Magnetic className="block">
                   <a
                     href={RESUME_PATH}
-                    download
+                    download="Gaurav-Raj-Resume.pdf"
+                    onClick={() => trackResumeDownload("contact")}
                     className={`${btn} border-brand bg-brand text-brand-fg hover:brightness-110`}
                   >
                     <IconDownload size={18} aria-hidden className="transition-transform duration-200 group-hover:translate-y-0.5" />

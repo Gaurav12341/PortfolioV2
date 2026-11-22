@@ -15,7 +15,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: p.title,
     description: p.oneLiner,
     alternates: { canonical: `/work/${p.slug}` },
-    openGraph: { title: `${p.title} · Gaurav Raj`, description: p.oneLiner },
+    /* child openGraph/twitter replace the root ones wholesale, so restate
+       them; the images come from ./opengraph-image.tsx and ./twitter-image.tsx */
+    openGraph: {
+      type: "article",
+      url: `/work/${p.slug}`,
+      siteName: "Gaurav Raj",
+      title: `${p.title} · Gaurav Raj`,
+      description: p.oneLiner,
+    },
+    twitter: { card: "summary_large_image", title: `${p.title} · Gaurav Raj`, description: p.oneLiner },
   };
 }
 

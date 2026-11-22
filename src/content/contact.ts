@@ -3,9 +3,9 @@
  * component. Keep em-dashes out of visible copy.
  */
 export const contact = {
-  heading: "Hiring for backend or applied AI? Let's talk.",
+  heading: "Hiring for backend or AI? Let's talk.",
   sub: "Pick a 30-minute slot, or reach me directly. I reply within a day.",
-  badge: "Available for SDE-2 / Backend / Applied AI roles",
+  badge: "Available for Backend, AI & Full-stack roles",
 
   /**
    * Swap for the laptop illustration when it arrives: drop the WebP in
@@ -23,7 +23,7 @@ export const contact = {
   },
 
   /** Clicking one prefills the notes field in the Cal.com booking form. */
-  topics: ["Full-time role", "Referral", "Applied AI collab", "Just saying hi"],
+  topics: ["Full-time role", "Referral", "AI collab", "Just saying hi"],
 
   /** Cal.com event slug (event type must exist on the account). */
   calEvent: "30min",

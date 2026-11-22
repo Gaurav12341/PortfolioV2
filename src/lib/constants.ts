@@ -1,7 +1,5 @@
 export const BASE_URL = "https://portfolio.gaurav-raj.in";
 
-export const OG_IMAGE = `${BASE_URL}/og-image.png`;
-
 // Set up on Cal.com with a "30min" event type.
 export const CAL_USERNAME: string | null = "gaurav-raj-ergsgy";
 
@@ -20,3 +18,6 @@ export const SOCIAL_LINKS = [
 // source for scrapers — decoded client-side only when the user clicks
 // "reveal". See PhoneReveal component.
 export const PHONE_NUMBER_B64 = "KzkxODk2OTc4NjYyNw==";
+
+/** Public source repo, linked from the footer. */
+export const SOURCE_URL = "https://github.com/Gaurav12341/PortfolioV2";

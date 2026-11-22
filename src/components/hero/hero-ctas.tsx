@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowRight, Download } from "lucide-react";
 import { Magnetic } from "@/components/motion";
 import { scrollToTarget } from "@/lib/scroll";
+import { trackResumeDownload } from "@/lib/analytics";
 import { RESUME_PATH } from "@/lib/constants";
 import { hero } from "@/content/hero";
 
@@ -34,6 +35,7 @@ export function HeroCtas() {
         <a
           href={RESUME_PATH}
           download="Gaurav-Raj-Resume.pdf"
+          onClick={() => trackResumeDownload("hero")}
           className="inline-flex h-12 items-center gap-2 rounded-full border border-line-strong bg-surface-solid/70 px-6 text-[15px] font-medium text-foreground backdrop-blur-sm transition-colors hover:bg-surface-solid active:scale-[0.97]"
         >
           {secondary.label}

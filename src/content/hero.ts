@@ -3,9 +3,9 @@
  * Numbers must come from PHASES.md §11 (verified facts) only.
  */
 export const hero = {
-  status: "Open to SDE-2 / Backend / Applied AI roles · Bengaluru",
+  status: "Open to Backend, AI & Full-stack roles · Bengaluru",
   name: "Gaurav Raj",
-  title: "Backend & Applied AI Engineer",
+  title: "Backend & AI Engineer",
   summary:
     "I build distributed systems and RAG pipelines that hold up under load — .NET, Kafka, Kubernetes, Python.",
   ctas: {
