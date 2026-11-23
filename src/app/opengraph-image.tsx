@@ -1,3 +1,4 @@
+import { SITE_HOST } from "@/lib/constants";
 import { renderShareCard } from "./_brand/share-card";
 
 /**
@@ -11,7 +12,7 @@ export const contentType = "image/png";
 
 export default function OpengraphImage() {
   return renderShareCard({
-    eyebrow: "portfolio.gaurav-raj.in",
+    eyebrow: SITE_HOST,
     title: "Gaurav Raj",
     uppercase: true,
     lead: "Backend & AI Engineer",

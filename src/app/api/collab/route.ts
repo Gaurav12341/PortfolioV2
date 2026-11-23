@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
-import { CONTACT_EMAIL } from "@/lib/constants";
+import { CONTACT_EMAIL, SITE_HOST } from "@/lib/constants";
 
-// Add RESEND_API_KEY to your .env.local
-// Your sending domain must be verified in the Resend dashboard
-const resend = new Resend(process.env.RESEND_API_KEY);
+/**
+ * Collab form → email via Resend (free tier).
+ * Needs RESEND_API_KEY (.env.local locally, Vercel env vars in production),
+ * and gaurav-raj.in verified as a sending domain in the Resend dashboard.
+ * Limits match the client-side schema in collab-modal.tsx.
+ */
+const LIMITS = { name: 100, email: 254, projectType: 60, message: 5000 } as const;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function escapeHtml(str: string): string {
   return str
@@ -15,33 +20,52 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#039;");
 }
 
+const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+
 export async function POST(req: NextRequest) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error("Collab API: RESEND_API_KEY is not set");
+    return NextResponse.json({ error: "Email is not configured" }, { status: 503 });
+  }
+
+  let body: Record<string, unknown>;
   try {
-    const body = await req.json();
-    const { name, email, projectType, message } = body as {
-      name?: string;
-      email?: string;
-      projectType?: string;
-      message?: string;
-    };
+    body = (await req.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  try {
+    const name = str(body.name);
+    const email = str(body.email);
+    const projectType = str(body.projectType);
+    const message = str(body.message);
 
     if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+    if (
+      !EMAIL_RE.test(email) ||
+      name.length > LIMITS.name ||
+      email.length > LIMITS.email ||
+      projectType.length > LIMITS.projectType ||
+      message.length > LIMITS.message
+    ) {
+      return NextResponse.json({ error: "Invalid input" }, { status: 400 });
     }
 
+    const resend = new Resend(apiKey);
     const safeName = escapeHtml(name);
     const safeEmail = escapeHtml(email);
-    const safeProjectType = escapeHtml(projectType ?? "—");
+    const safeProjectType = escapeHtml(projectType || "—");
     const safeMessage = escapeHtml(message);
 
     const { data, error } = await resend.emails.send({
       from: "Gaurav Raj <hello@gaurav-raj.in>",
       to: [CONTACT_EMAIL],
       replyTo: email,
-      subject: `New Collab Request — ${name}`,
+      subject: `New Collab Request — ${name.replace(/[\r\n]+/g, " ")}`,
       html: `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -85,7 +109,7 @@ export async function POST(req: NextRequest) {
     </table>
 
     <div style="margin-top:48px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.07);">
-      <p style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin:0;">PORTFOLIO.GAURAV-RAJ.IN</p>
+      <p style="font-family:'Courier New',Courier,monospace;font-size:9px;letter-spacing:0.25em;color:rgba(255,255,255,0.2);text-transform:uppercase;margin:0;">${SITE_HOST.toUpperCase()}</p>
     </div>
   </div>
 </body>

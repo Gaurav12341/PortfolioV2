@@ -1,4 +1,5 @@
 import { getProject, workProjects } from "@/content/projects";
+import { SITE_HOST } from "@/lib/constants";
 import { renderShareCard } from "../../_brand/share-card";
 
 /** Per-case-study share card: title, one-liner and the first measured metrics. */
@@ -25,7 +26,7 @@ const summary = (s: string, n: number) => {
 export default async function WorkOgImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = getProject(slug);
-  if (!p) return renderShareCard({ eyebrow: "portfolio.gaurav-raj.in", title: "Gaurav Raj", chips: [] });
+  if (!p) return renderShareCard({ eyebrow: SITE_HOST, title: "Gaurav Raj", chips: [] });
 
   const chips = p.metrics
     .filter((m) => !m.projected)
