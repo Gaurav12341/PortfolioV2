@@ -12,7 +12,7 @@
 **Positioning line (use everywhere):** *Backend & Applied AI Engineer — I build distributed systems and RAG pipelines that hold up under load.*
 
 **Inspiration, not a clone.** The layout idea comes from a friend's creator portfolio (manndamani.com). Mine is an **engineer's** portfolio, so it must look and read differently:
-- Don't reuse their copy (for example "Let's Make Something Awesome Together", "I'd rather let the work do the talking").
+- Don't reuse their copy (for example "Let's Make Something Awesome Together"). Exception, by my choice: the About intro headline "I'd rather let the work do the talking." and its layout over the portrait stay.
 - Don't use a logo that looks like theirs. Keep my own mark.
 - Swap the creator signals (show reels, Vimeo walls, view counts) for engineering signals: architecture diagrams, metrics, evals, code.
 
@@ -263,9 +263,9 @@ Turn it from "okay" into the section that makes a manager want to talk to me.
 - Images: `next/image` everywhere possible, AVIF/WebP, correct `sizes`. Lazy-load everything below the fold. No asset over 300 KB except the video.
 - Fonts: `next/font` with `display: swap`. Preload only the hero weights.
 - Code-split heavy components (SystemGraph, ArchDiagram, DemoVideo, Cal embed) with `dynamic()`, and load them on view.
-- Run Lighthouse (mobile + desktop) and fix until the targets in §0 pass. Save the reports to `docs/lighthouse/`.
+- Run Lighthouse (mobile + desktop) and fix until the targets in §0 pass. Summarise the results in `docs/LIGHTHOUSE.md` (only markdown is kept in the repo; no report files).
 - Accessibility: keyboard-only walkthrough of the whole page (visible focus, logical order, a skip-to-content link), screen-reader labels on all icon buttons, alt text on all images, reduced motion verified.
-- Playwright screenshot pass at 390, 768, 1280 and 1440 px, light + dark, into `docs/screens/after/`. Compare against `before/` and send me a summary.
+- Playwright screenshot pass at 390, 768, 1280 and 1440 px, light + dark, kept out of the repo (only markdown is kept). Send me a summary.
 - Test Safari specifically (video autoplay, canvas DPR, `offset-path`, backdrop-blur).
 
 ---

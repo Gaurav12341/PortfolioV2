@@ -4,27 +4,17 @@
  * decisions. Keep em-dashes out of visible copy.
  */
 
-/** Lines shown at the end of the scroll sequence (Phase 5). */
 /** Closes the scroll sequence, over the portrait. */
 export const aboutIntro = {
   kicker: "About Me",
   /** Rendered as: before + <em>emphasis</em> + after. */
   headline: { before: "I'd rather let the", emphasis: "work", after: "do the talking." },
-  line: "~2 years building backend systems and cloud platforms at Honeywell — plus hands-on experience shipping production AI/RAG systems on top of them. Built on one simple rule: ship something measurable, and defend it.",
+  line: "~2 years building backend systems and cloud platforms at Honeywell, plus hands-on experience shipping production AI/RAG systems on top of them. Built on one simple rule: ship something measurable, and defend it.",
   disciplines: ["Backend", "Distributed Systems", "Cloud", "AI"],
   status: "Open to Opportunities",
 } as const;
 
 export const about = {
-  /**
-   * PHASES.md Phase 6 headline options. Option 1 already closes the scroll
-   * sequence, so the About section uses option 2 to avoid repeating it.
-   */
-  headlineOptions: [
-    "I like systems that stay boring at 3 a.m.",
-    "Backend engineer who measures before he optimizes.",
-    "I build things that keep working when the traffic doesn't behave.",
-  ],
   headline: "Backend engineer who measures before he optimizes.",
 
   /** Three short paragraphs, under 120 words in total. */

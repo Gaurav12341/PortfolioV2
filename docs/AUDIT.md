@@ -1,6 +1,6 @@
 # Phase 0: Audit (portfolio-v2)
 
-_Date: 2026-11-22 · Branch: `portfolio-v2` · Screenshots: `docs/screens/before/` (1440×900 and 390×844, dark theme, 15 shots each)_
+_Date: 2026-11-22 · Branch: `portfolio-v2` · Screenshots were taken at 1440×900 and 390×844 (dark theme) and later deleted: only markdown is kept in the repo_
 
 ---
 

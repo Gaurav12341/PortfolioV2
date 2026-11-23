@@ -14,10 +14,5 @@ export const SOCIAL_LINKS = [
   { name: "LeetCode", href: "https://leetcode.com/u/Gaurav2706/" },
 ] as const;
 
-// Base64-encoded so the raw number isn't sitting in plaintext in the page
-// source for scrapers — decoded client-side only when the user clicks
-// "reveal". See PhoneReveal component.
-export const PHONE_NUMBER_B64 = "KzkxODk2OTc4NjYyNw==";
-
 /** Public source repo, linked from the footer. */
 export const SOURCE_URL = "https://github.com/Gaurav12341/PortfolioV2";

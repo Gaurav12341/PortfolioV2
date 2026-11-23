@@ -6,7 +6,6 @@ import { ArrowLeft, ArrowRight, ChevronDown, ShieldCheck, UserRound, Wrench } fr
 import { DiagramStory } from "@/components/diagram/DiagramStory";
 import { BeforeAfter } from "@/components/diagram/BeforeAfter";
 import { CountUp, Reveal, RevealItem, SplitText } from "@/components/motion";
-import { DevTodo } from "@/components/common/dev-todo";
 import { workProjects, type WorkProject } from "@/content/projects";
 import { VariantToggle, type RagMode } from "./variant-toggle";
 
@@ -50,7 +49,6 @@ export function CaseStudy({ project: p }: { project: WorkProject }) {
             </ul>
           )}
         </header>
-        <DevTodo items={p.todos} className="mt-6 max-w-3xl" />
 
         {/* Context / Problem */}
         <Reveal stagger={0.08} className="mt-14 grid gap-4 md:grid-cols-2">

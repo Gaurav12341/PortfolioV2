@@ -109,8 +109,9 @@ const Navbar: React.FC = () => {
         aria-label="Primary"
         className="pointer-events-auto flex w-full max-w-3xl items-center justify-between gap-2 rounded-full border border-line bg-surface-solid/85 py-1.5 pl-3 pr-1.5 shadow-[0_8px_30px_-12px_rgb(0_0_0/0.25)] backdrop-blur-xl"
       >
-        <a href="#top" onClick={(e) => go(e, "#top")} className="rounded-lg" aria-label="Gaurav Raj, back to top">
+        <a href="#top" onClick={(e) => go(e, "#top")} className="rounded-lg">
           <Logo />
+          <span className="sr-only">, back to top</span>
         </a>
 
         {/* Desktop links */}
@@ -170,8 +171,9 @@ const Navbar: React.FC = () => {
                       <Dialog.Title className="sr-only">Menu</Dialog.Title>
 
                       <div className="flex items-center justify-between">
-                        <a href="#top" onClick={(e) => go(e, "#top")} aria-label="Gaurav Raj, back to top">
+                        <a href="#top" onClick={(e) => go(e, "#top")}>
                           <Logo withName />
+                          <span className="sr-only">, back to top</span>
                         </a>
                         <Dialog.Close
                           aria-label="Close menu"

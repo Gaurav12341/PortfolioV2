@@ -18,7 +18,7 @@ export const supportRag = {
   video: {
     mp4: "/videos/supportrag.mp4",
     webm: "/videos/supportrag.webm",
-    poster: "/videos/supportrag-poster.jpg",
+    poster: "/videos/supportrag-poster.webp",
     label: "supportrag · dev",
     title: "SupportRAG demo: a cited answer, access levels, and a refusal",
   },

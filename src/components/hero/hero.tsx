@@ -8,7 +8,8 @@ import { HeroCtas } from "./hero-ctas";
  *
  * Server component: all text is in the initial HTML, and entrance motion is
  * CSS keyframes (`rise-in`, `.anim-fade-up`) so it plays on first paint
- * without waiting for hydration. The H1 is the LCP element.
+ * without waiting for hydration. The summary paragraph is the LCP element
+ * on phones, so it rises without fading (see .anim-rise-up).
  */
 export default function Hero() {
   return (
@@ -64,8 +65,9 @@ export default function Hero() {
             {hero.title}
           </h2>
 
+          {/* LCP element on phones: rises without fading (see .anim-rise-up) */}
           <p
-            className="anim-fade-up mt-5 max-w-xl text-lead text-muted-foreground"
+            className="anim-rise-up mt-5 max-w-xl text-lead text-muted-foreground"
             style={{ "--d": "0.35s" } as React.CSSProperties}
           >
             {hero.summary}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion, useScroll, useTransform } from "motion/react";
 import { toast } from "sonner";
 import {
@@ -15,7 +16,14 @@ import { contact } from "@/content/contact";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 import { CAL_USERNAME, CONTACT_EMAIL, RESUME_PATH, SOCIAL_LINKS } from "@/lib/constants";
 import { trackResumeDownload } from "@/lib/analytics";
-import { CalInline } from "./cal-inline";
+import { LoadOnView } from "@/components/common/load-on-view";
+
+/** Cal.com's embed pulls ~700 KB of third-party JS: fetch it only near the booker. */
+const BookerPlaceholder = () => <div aria-hidden className="h-full animate-pulse bg-foreground/[0.04]" />;
+const CalInline = dynamic(() => import("./cal-inline").then((m) => m.CalInline), {
+  ssr: false,
+  loading: () => <BookerPlaceholder />,
+});
 
 const linkedin = SOCIAL_LINKS.find((l) => l.name === "LinkedIn")!.href;
 const github = SOCIAL_LINKS.find((l) => l.name === "GitHub")!.href;
@@ -182,7 +190,9 @@ export default function ContactSection() {
           <Reveal className="relative h-[640px] lg:col-span-7 lg:h-auto" delay={0.1}>
             <div className="absolute inset-0 overflow-hidden rounded-3xl border border-line bg-surface-solid shadow-[0_30px_60px_-30px_rgb(60_10_30/0.25)]">
               {CAL_USERNAME ? (
-                <CalInline calLink={`${CAL_USERNAME}/${contact.calEvent}`} notes={topic ?? undefined} />
+                <LoadOnView className="h-full" fallback={<BookerPlaceholder />}>
+                  <CalInline calLink={`${CAL_USERNAME}/${contact.calEvent}`} notes={topic ?? undefined} />
+                </LoadOnView>
               ) : (
                 <div className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
                   Booking isn&apos;t set up yet. Use the email button instead.

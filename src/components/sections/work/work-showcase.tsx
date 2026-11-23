@@ -6,8 +6,7 @@ import { ArrowRight, ChevronLeft, ChevronRight, MousePointerClick, UserRound } f
 import { ArchDiagram } from "@/components/diagram/ArchDiagram";
 import { BeforeAfter } from "@/components/diagram/BeforeAfter";
 import { CountUp, Reveal } from "@/components/motion";
-import { DevTodo } from "@/components/common/dev-todo";
-import { globalTodos, platformContext, workProjects, type WorkProject } from "@/content/projects";
+import { platformContext, workProjects, type WorkProject } from "@/content/projects";
 import { cn } from "@/lib/utils";
 import { VariantToggle, type RagMode } from "./variant-toggle";
 import { HandNote } from "@/components/common/hand-note";
@@ -68,7 +67,6 @@ export default function WorkShowcase() {
           </div>
           <p className="mt-5 max-w-3xl text-lead text-muted-foreground">{platformContext}</p>
         </Reveal>
-        <DevTodo items={globalTodos} className="mt-4 max-w-3xl" />
 
         {/* Tabs + prev/next */}
         <div className="mt-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -208,7 +206,6 @@ function Slide({ project: p, index, active }: { project: WorkProject; index: num
               {p.stack.length > 3 && ` +${p.stack.length - 3}`}
             </span>
           </div>
-          <DevTodo items={p.todos} className="mt-5" />
         </div>
 
         {/* ── Right: live architecture (B) + before/after (C) ── */}

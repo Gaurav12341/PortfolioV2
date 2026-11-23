@@ -127,17 +127,48 @@ export default function AboutScrollSection() {
       });
 
     // frame 0 first, then the rest 4 at a time
-    (async () => {
+    const start = async () => {
       await load(0);
       const queue = Array.from({ length: n - 1 }, (_, k) => k + 1);
       const worker = async () => {
         while (queue.length && !cancelled) await load(queue.shift()!);
       };
       await Promise.all([worker(), worker(), worker(), worker()]);
-    })();
+    };
+
+    // Don't compete with the hero on first load: start once the page has
+    // loaded and the main thread is idle, or earlier if the visitor scrolls
+    // toward the section.
+    let started = false;
+    let cancelIdle = () => {};
+    const kick = () => {
+      if (started || cancelled) return;
+      started = true;
+      io?.disconnect();
+      start();
+    };
+    const io =
+      "IntersectionObserver" in window && wrapRef.current
+        ? new IntersectionObserver((entries) => entries.some((e) => e.isIntersecting) && kick(), { rootMargin: "10% 0px" })
+        : null;
+    if (wrapRef.current) io?.observe(wrapRef.current);
+    const onLoad = () => {
+      if (typeof window.requestIdleCallback === "function") {
+        const id = window.requestIdleCallback(kick, { timeout: 2000 });
+        cancelIdle = () => window.cancelIdleCallback(id);
+      } else {
+        const id = setTimeout(kick, 200); // Safari < 18 has no requestIdleCallback
+        cancelIdle = () => clearTimeout(id);
+      }
+    };
+    if (document.readyState === "complete") onLoad();
+    else window.addEventListener("load", onLoad, { once: true });
 
     return () => {
       cancelled = true;
+      io?.disconnect();
+      window.removeEventListener("load", onLoad);
+      cancelIdle();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mobile, reduce]);

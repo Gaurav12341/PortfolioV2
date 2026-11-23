@@ -59,59 +59,19 @@ export default function Preloader({
   const pct = Math.min(100, Math.max(0, progress));
   const index = Math.min(GREETINGS.length - 1, Math.floor((pct / 100) * GREETINGS.length));
 
-  // Curved bottom edge for the lift (desktop only; too heavy for phone GPUs).
-  const { w, h } = size;
-  const curve: Variants = {
-    initial: {
-      d: `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h + 300} 0 ${h} L0 0`,
-      transition: { duration: 1.7, ease: EASE_CURTAIN },
-    },
-    exit: {
-      d: `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h} 0 ${h} L0 0`,
-      transition: { duration: 1.7, ease: EASE_CURTAIN, delay: 0.3 },
-    },
-  };
-
   return (
     <motion.div
       id="intro-preloader"
       role="status"
       aria-live="polite"
-      aria-label={`Loading ${pct}%`}
+      aria-label="Loading"
       variants={slideUp}
       initial="initial"
       exit="exit"
       className="fixed inset-0 z-[99] text-foreground"
       style={{ willChange: "transform" }}
     >
-      {/* Panel background: a flat fill on mobile / before measuring, the
-          curved SVG on desktop so the bottom edge bows as it lifts. */}
-      {desktop && w > 0 ? (
-        <svg className="absolute left-0 top-0 w-full" style={{ height: "calc(100% + 300px)" }} aria-hidden>
-          <motion.path variants={curve} initial="initial" exit="exit" className="fill-background" />
-        </svg>
-      ) : (
-        <div className="absolute inset-0 bg-background" aria-hidden />
-      )}
-
-      {/* Faint grid, same as the page */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-        }}
-      />
-
-      {/* Soft accent glow (desktop) */}
-      {desktop && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/2 size-[320px] -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-brand/15 blur-[120px]"
-        />
-      )}
+      <Backdrop desktop={desktop} w={size.w} h={size.h} />
 
       {/* Greeting */}
       <div className="absolute inset-0 flex items-center justify-center" aria-hidden>
@@ -161,3 +121,53 @@ export default function Preloader({
     </motion.div>
   );
 }
+
+/**
+ * Static layers (panel, grid, glow), memoised so the per-percent progress
+ * updates don't re-render them. The panel is a flat fill on mobile / before
+ * measuring, and a curved SVG on desktop so the bottom edge bows as it lifts
+ * (too heavy for phone GPUs).
+ */
+const Backdrop = React.memo(function Backdrop({ desktop, w, h }: { desktop: boolean; w: number; h: number }) {
+  const curve: Variants = {
+    initial: {
+      d: `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h + 300} 0 ${h} L0 0`,
+      transition: { duration: 1.7, ease: EASE_CURTAIN },
+    },
+    exit: {
+      d: `M0 0 L${w} 0 L${w} ${h} Q${w / 2} ${h} 0 ${h} L0 0`,
+      transition: { duration: 1.7, ease: EASE_CURTAIN, delay: 0.3 },
+    },
+  };
+
+  return (
+    <>
+      {desktop && w > 0 ? (
+        <svg className="absolute left-0 top-0 w-full" style={{ height: "calc(100% + 300px)" }} aria-hidden>
+          <motion.path variants={curve} initial="initial" exit="exit" className="fill-background" />
+        </svg>
+      ) : (
+        <div className="absolute inset-0 bg-background" aria-hidden />
+      )}
+
+      {/* Faint grid, same as the page */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, var(--grid-line) 1px, transparent 1px), linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+        }}
+      />
+
+      {/* Soft accent glow (desktop) */}
+      {desktop && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute left-1/2 top-1/2 size-[320px] -translate-x-1/2 -translate-y-1/2 animate-pulse rounded-full bg-brand/15 blur-[120px]"
+        />
+      )}
+    </>
+  );
+});

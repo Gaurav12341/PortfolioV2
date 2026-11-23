@@ -41,8 +41,6 @@ export type WorkProject = {
     after: { label: string; value: number; display: string };
     delta: string;
   };
-  /** Shown only in development (DevTodo): facts still ❓ in PROJECTS.md. */
-  todos?: string[];
 };
 
 /* Shared grid for every diagram: 5 columns in an 800-wide viewBox. */
@@ -453,6 +451,3 @@ export const workProjects: WorkProject[] = [
 ];
 
 export const getProject = (slug: string) => workProjects.find((p) => p.slug === slug);
-
-/** Site-wide open questions (PROJECTS.md, "Open questions for me"). */
-export const globalTodos: string[] = [];

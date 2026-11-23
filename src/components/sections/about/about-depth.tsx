@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   motion,
+  useInView,
   useMotionValue,
   useScroll,
   useSpring,
@@ -131,6 +132,8 @@ export function AboutDepth() {
   const wrapRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [flex, setFlex] = useState(false);
+  /** The "Let me Flex!" cursor loop runs only while the stage is on screen. */
+  const stageInView = useInView(stageRef, { margin: "100px" });
 
   /* scroll: 0 when the stage pins, 1 when it releases */
   const { scrollYProgress } = useScroll({ target: wrapRef, offset: ["start start", "end end"] });
@@ -317,7 +320,7 @@ export function AboutDepth() {
             {/* a cursor that keeps reaching for the button and "clicks" it. The ring
                 pops on the press, then lingers and fades while the cursor drifts back.
                 Keyframe times must end at 1, or the ring jumps when the loop restarts. */}
-            {!flex && !reduce && (
+            {!flex && !reduce && stageInView && (
               <div aria-hidden className="pointer-events-none absolute -bottom-7 right-3 transition-opacity duration-200 group-hover:opacity-0">
                 <motion.span
                   className="absolute -left-1 -top-1 size-2.5 rounded-full border border-brand"

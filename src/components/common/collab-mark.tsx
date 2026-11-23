@@ -4,8 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, useInView } from "motion/react";
 import { IconX } from "@tabler/icons-react";
-import CollabModal from "@/components/sections/home/collab-modal";
+import dynamic from "next/dynamic";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
+
+/** The form (with zod + react-hook-form) loads on first hover/focus/click, not with the page. */
+const loadModal = () => import("@/components/sections/home/collab-modal");
+const CollabModal = dynamic(loadModal, { ssr: false });
 
 /**
  * The collab mark (taken from the old "Together we build" screen): a dark
@@ -16,6 +20,8 @@ import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
  */
 export function CollabMark({ label = "Let's collaborate ✦ Click to start ✦" }: { label?: string }) {
   const [open, setOpen] = useState(false);
+  /** Mount the modal only once it has been opened (it stays mounted for its exit animation). */
+  const [used, setUsed] = useState(false);
   const ref = useRef<HTMLButtonElement>(null);
   const inView = useInView(ref, { margin: "100px" });
   const reduce = useReducedMotionSafe();
@@ -30,7 +36,12 @@ export function CollabMark({ label = "Let's collaborate ✦ Click to start ✦" 
       <motion.button
         ref={ref}
         type="button"
-        onClick={() => setOpen(true)}
+        onPointerEnter={loadModal}
+        onFocus={loadModal}
+        onClick={() => {
+          setUsed(true);
+          setOpen(true);
+        }}
         aria-label="Open the collaboration form"
         aria-haspopup="dialog"
         className="group relative flex size-36 cursor-pointer items-center justify-center rounded-full md:size-44"
@@ -42,11 +53,12 @@ export function CollabMark({ label = "Let's collaborate ✦ Click to start ✦" 
         whileTap={{ scale: 0.95 }}
       >
         {/* orbiting CTA text */}
-        <motion.span
+        {/* Both loops are CSS animations paused unless `live` (on screen, motion
+            allowed): an infinite motion animation keeps running once started. */}
+        <span
           aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-80 transition-opacity duration-500 group-hover:opacity-100"
-          animate={live ? { rotate: 360 } : undefined}
-          transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
+          className="pointer-events-none absolute inset-0 animate-[collab-orbit_16s_linear_infinite] opacity-80 transition-opacity duration-500 group-hover:opacity-100"
+          style={{ animationPlayState: live ? "running" : "paused" }}
         >
           <svg viewBox="0 0 100 100" className="size-full">
             <defs>
@@ -56,33 +68,21 @@ export function CollabMark({ label = "Let's collaborate ✦ Click to start ✦" 
               <textPath href="#collab-ring">{label}</textPath>
             </text>
           </svg>
-        </motion.span>
+        </span>
 
-        {/* pulse ring */}
-        <motion.span
+        {/* pulse ring (hidden when not live) */}
+        <span
           aria-hidden
-          className="pointer-events-none absolute size-16 rounded-full border border-brand md:size-20"
-          animate={live ? { scale: [1, 1.7], opacity: [0.6, 0] } : { opacity: 0 }}
-          transition={{ duration: 2.4, repeat: Infinity, ease: "easeOut" }}
+          className="pointer-events-none absolute size-16 animate-[collab-pulse_2.4s_ease-out_infinite] rounded-full border border-brand md:size-20"
+          style={{ animationPlayState: live ? "running" : "paused", visibility: live ? "visible" : "hidden" }}
         />
 
         {/* puck: dark in both themes so the crimson glows */}
         <span className="relative flex size-16 items-center justify-center md:size-20">
-          <motion.span
+          <span
             aria-hidden
-            className="absolute inset-0 rounded-full border border-brand/40 bg-[#0b0a0d]/90 backdrop-blur-sm"
-            animate={
-              live
-                ? {
-                    boxShadow: [
-                      "0 0 20px rgb(225 29 72 / 0.2)",
-                      "0 0 40px rgb(225 29 72 / 0.45)",
-                      "0 0 20px rgb(225 29 72 / 0.2)",
-                    ],
-                  }
-                : undefined
-            }
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute inset-0 animate-[collab-glow_3s_ease-in-out_infinite] rounded-full border border-brand/40 bg-[#0b0a0d]/90 shadow-[0_0_20px_rgb(225_29_72/0.2)] backdrop-blur-sm"
+            style={{ animationPlayState: live ? "running" : "paused" }}
           />
           {/* ✕ turns 45° into a + on hover: a join/add metaphor */}
           <IconX
@@ -94,7 +94,7 @@ export function CollabMark({ label = "Let's collaborate ✦ Click to start ✦" 
         </span>
       </motion.button>
 
-      {mounted && createPortal(<CollabModal isOpen={open} onClose={() => setOpen(false)} />, document.body)}
+      {mounted && used && createPortal(<CollabModal isOpen={open} onClose={() => setOpen(false)} />, document.body)}
     </>
   );
 }

@@ -14,7 +14,8 @@ export default function Analytics() {
 
   return (
     <>
-      <VercelAnalytics />
+      {/* VERCEL is set on Vercel builds; elsewhere its script 404s */}
+      {process.env.VERCEL && <VercelAnalytics />}
       {gaId && (
         <>
           <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />

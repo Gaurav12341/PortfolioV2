@@ -75,8 +75,9 @@ export default function Footer() {
         {/* columns */}
         <div className="mt-20 grid grid-cols-2 gap-x-6 gap-y-12 border-t border-line pt-12 md:grid-cols-12">
           <Reveal className="col-span-2 flex flex-col gap-5 md:col-span-5">
-            <Link href="/" aria-label="Gaurav Raj, home" className="w-fit">
+            <Link href="/" className="w-fit">
               <Logo withName />
+              <span className="sr-only">, home</span>
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">
               Backend &amp; AI Engineer at Honeywell, Bengaluru.
