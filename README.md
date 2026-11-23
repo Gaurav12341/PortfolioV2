@@ -20,7 +20,7 @@ RESEND_API_KEY=      # resend.com, gaurav-raj.in verified as a sending domain
 NEXT_PUBLIC_GA_ID=   # optional
 ```
 
-## Docs
+## Docs (kept locally, not in the repo)
 
 - `docs/CONTENT.md`: where every piece of copy, metric and link lives, and how to edit it
 - `docs/SEQUENCE.md`: rebuilding the scroll-sequence frames and portraits

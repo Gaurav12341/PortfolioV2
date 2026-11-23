@@ -56,3 +56,7 @@ PROJECTS.MD
 
 # local demos (not part of the site)
 /docs/demos/
+
+# Notes and docs stay local: only the root README goes to GitHub
+*.md
+!/README.md
