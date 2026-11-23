@@ -1,61 +1,39 @@
-"use client";
-
-import { useState } from "react";
-import { AnimatePresence } from "framer-motion";
-import AboutMe from "@/components/sections/about/about-me";
-import CalBooking from "@/components/sections/home/cal-booking";
-import Achievements from "@/components/sections/home/achievements";
-import { ExperienceTimeline } from "@/components/sections/home/timeline-demo";
-import Preloader from "@/components/common/preloader";
-import ProjectsShowcase from "@/components/sections/showreel";
-import CollabSec from "@/components/sections/home/collab-section";
+import Hero from "@/components/hero/hero";
+import ContactSection from "@/components/sections/contact/contact-section";
+import { ExperienceTimeline } from "@/components/sections/about/experience-timeline";
+import WorkShowcase from "@/components/sections/work/work-showcase";
+import SupportRagSection from "@/components/sections/featured/supportrag-section";
 import AboutScrollSection from "@/components/sections/about/about-scroll-section";
 import AboutSection from "@/components/sections/about/about-section";
 
+/**
+ * Server component. No preloader: the hero text is in the initial HTML and
+ * is the LCP element. Heavy sections hydrate on their own.
+ */
 export default function Home() {
-  // The Preloader owns the (60fps) load-progress state internally so those
-  // updates never re-render this heavy page tree. It just tells us when it's
-  // done, and we drop it.
-  const [isLoading, setIsLoading] = useState(true);
-
-  const handleLoaded = () => {
-    setIsLoading(false);
-    document.body.style.cursor = "default";
-    window.scrollTo(0, 0);
-  };
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center scroll-smooth">
-      <AnimatePresence mode="wait">
-        {isLoading && <Preloader onComplete={handleLoaded} />}
-      </AnimatePresence>
+    <div className="flex min-h-screen flex-col items-center justify-center">
+      <Hero />
 
-      {/*About Me is Hero Section */}
-      <section id="hero" className="w-full">
-        <AboutMe />
-      </section>
+      {/* Scroll sequence: frames, then the portrait reveal (Phase 5) */}
+      <AboutScrollSection />
 
-      {/* Projects Section — id="projects" is set on the section inside ProjectsShowcase */}
-      <ProjectsShowcase />
+      {/* Work = featured project + work case studies */}
+      <div id="work" className="w-full scroll-mt-[88px]">
+        <SupportRagSection />
+        <WorkShowcase />
+      </div>
 
-      {/* About Scroll Section */}
-      <section id="about" className="">
-        <AboutScrollSection />
+      <section id="about" aria-label="About" className="w-full">
         <AboutSection />
       </section>
 
-      {/* Experience Section */}
-      <section id="experience" className="w-full scroll-mt-[84px]">
+      <section id="experience" aria-labelledby="experience-title" className="w-full scroll-mt-[88px]">
         <ExperienceTimeline />
       </section>
 
-      <CollabSec />
-
-      <Achievements />
-
-      {/* Contact Section */}
-      <section id="contact" className="w-full scroll-mt-[84px]">
-        <CalBooking />
+      <section id="contact" aria-label="Contact" className="w-full scroll-mt-[88px]">
+        <ContactSection />
       </section>
     </div>
   );

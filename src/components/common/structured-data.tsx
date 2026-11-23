@@ -1,76 +1,52 @@
-import { BASE_URL, OG_IMAGE } from "@/lib/constants";
+import { BASE_URL, SOCIAL_LINKS } from "@/lib/constants";
 
+/**
+ * JSON-LD (PHASES.md Phase 8): a Person and the WebSite it belongs to.
+ * Facts from PHASES.md §11 only.
+ */
 export default function StructuredData() {
-  const structuredData = {
+  const person = {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": `${BASE_URL}/#person`,
     name: "Gaurav Raj",
     url: BASE_URL,
-    image: OG_IMAGE,
+    image: `${BASE_URL}/images/portrait-anime.webp`,
+    jobTitle: "Software Engineer",
     description:
-      "Backend Software Engineer building distributed systems and cloud platforms, with hands-on experience shipping production AI/RAG systems.",
-    jobTitle: "Software Engineer I",
-    worksFor: {
-      "@type": "Organization",
-      name: "Honeywell",
-    },
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: "Bengaluru",
-      addressCountry: "IN",
-    },
-    sameAs: [
-      "https://www.linkedin.com/in/gaurav-raj-405a96237/",
-      "https://github.com/Gaurav12341",
-      "https://leetcode.com/u/Gaurav2706/",
-    ],
+      "Backend & AI Engineer building distributed systems and RAG pipelines that hold up under load.",
+    worksFor: { "@type": "Organization", name: "Honeywell" },
+    alumniOf: { "@type": "CollegeOrUniversity", name: "SRM Institute of Science and Technology" },
+    address: { "@type": "PostalAddress", addressLocality: "Bengaluru", addressCountry: "IN" },
+    sameAs: SOCIAL_LINKS.map((l) => l.href),
     knowsAbout: [
-      "Backend Development",
-      "Distributed Systems",
-      "Cloud Platforms",
-      "Microservices",
-      "Kafka",
-      "PostgreSQL",
+      "Backend engineering",
+      "Distributed systems",
       ".NET",
-      "Python",
-      "Retrieval-Augmented Generation",
-      "AI Agents",
+      "Kafka",
+      "Kubernetes",
+      "PostgreSQL",
+      "Retrieval-augmented generation",
+      "LLM evaluation",
     ],
   };
 
-  const websiteStructuredData = {
+  const website = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "Gaurav Raj Portfolio",
+    "@id": `${BASE_URL}/#website`,
+    name: "Gaurav Raj",
     url: BASE_URL,
-    description:
-      "Portfolio of Gaurav Raj, a Backend Software Engineer building distributed systems, cloud platforms, and production AI/RAG systems.",
-    author: {
-      "@type": "Person",
-      name: "Gaurav Raj",
-    },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${BASE_URL}/search?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
+    author: { "@id": `${BASE_URL}/#person` },
   };
+
+  /* "<" escaped so a value can never close the script tag */
+  const json = (o: object) => JSON.stringify(o).replace(/</g, "\\u003c");
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(websiteStructuredData),
-        }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(person) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json(website) }} />
     </>
   );
 }

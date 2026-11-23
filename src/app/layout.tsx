@@ -1,119 +1,76 @@
-import type { Metadata } from "next";
-import { Poppins, Cormorant_Garamond } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { brandMono, brandSans, noteFont } from "./fonts";
 import "./globals.css";
-import { BASE_URL, OG_IMAGE } from "@/lib/constants";
+import { BASE_URL } from "@/lib/constants";
 import LenisWrapper from "@/providers/lenis-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
+import { AppToaster } from "@/components/common/app-toaster";
 import FooterSection from "@/components/layout/footer";
 import Navbar from "@/components/layout/navbar";
 import StructuredData from "@/components/common/structured-data";
 import Analytics from "@/components/common/analytics";
 import ConsoleLog from "@/components/common/console-log";
 import CustomCursor from "@/components/ui/custom-cursor";
+import { IntroGate, introBootScript } from "@/components/common/intro-gate";
 
-const poppins = Poppins({
-  variable: "--font-poppins",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
-});
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f3e9e6" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b0a0d" },
+  ],
+};
 
-const cormorantGaramond = Cormorant_Garamond({
-  variable: "--font-accent",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  display: "swap",
-});
+/** PHASES.md Phase 8. "·" instead of an em-dash: none in visible copy. */
+const TITLE = "Gaurav Raj · Backend & AI Engineer";
+const DESCRIPTION =
+  "Backend & AI Engineer at Honeywell, Bengaluru. I build distributed systems and RAG pipelines that hold up under load: .NET, Kafka, Kubernetes, PostgreSQL.";
 
+/**
+ * Share images come from app/opengraph-image.tsx and app/twitter-image.tsx
+ * (next/og, 1200×630); Next adds the og:image / twitter:image tags itself.
+ */
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: {
-    default: "Gaurav Raj - Backend Software Engineer & Distributed Systems",
-    template: "%s | Gaurav Raj",
-  },
-  description:
-    "Backend Software Engineer building distributed systems and cloud platforms — with hands-on experience shipping production AI/RAG systems on top of them.",
+  title: { default: TITLE, template: "%s · Gaurav Raj" },
+  description: DESCRIPTION,
+  applicationName: "Gaurav Raj",
   keywords: [
     "Gaurav Raj",
-    "Backend Software Engineer",
-    "Distributed Systems",
-    "Cloud Platforms",
-    "Applied AI",
-    "RAG",
-    "Microservices",
-    "Kafka",
-    "FastAPI",
-    ".NET",
+    "Backend Engineer",
+    "AI Engineer",
+    "Full-stack Engineer",
     "Software Engineer Bengaluru",
+    "Distributed Systems",
+    "RAG",
+    "Kafka",
+    "Kubernetes",
+    ".NET",
+    "Honeywell",
   ],
-  authors: [{ name: "Gaurav Raj" }],
+  authors: [{ name: "Gaurav Raj", url: BASE_URL }],
   creator: "Gaurav Raj",
-  publisher: "Gaurav Raj",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
+  formatDetection: { email: false, address: false, telephone: false },
   openGraph: {
-    type: "website",
-    locale: "en_US",
+    type: "profile",
+    firstName: "Gaurav",
+    lastName: "Raj",
+    locale: "en_IN",
     url: BASE_URL,
-    title: "Gaurav Raj - Backend Software Engineer & Distributed Systems",
-    description:
-      "Software Engineer at Honeywell building microservices, deployment platforms, and production AI/RAG systems across enterprise and air-gapped environments.",
     siteName: "Gaurav Raj",
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: "Gaurav Raj - Portfolio preview",
-        type: "image/jpeg",
-      },
-    ],
+    title: TITLE,
+    description: DESCRIPTION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Gaurav Raj - Backend Software Engineer & Distributed Systems",
-    description:
-      "Software Engineer at Honeywell building microservices, deployment platforms, and production AI/RAG systems across enterprise and air-gapped environments.",
-    // TODO: add your Twitter/X handle here once you have one, e.g. creator: "@yourhandle"
-    images: [
-      {
-        url: OG_IMAGE,
-        width: 1200,
-        height: 630,
-        alt: "Gaurav Raj - Portfolio preview",
-      },
-    ],
+    title: TITLE,
+    description: DESCRIPTION,
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-    },
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
   },
-  icons: {
-    icon: [
-      { url: "/icon" },
-      { url: "/md-red-logo.svg", type: "image/svg+xml" },
-    ],
-    shortcut: "/md-red-logo.svg",
-    apple: "/md-red-logo.svg",
-  },
-  manifest: "/manifest.webmanifest",
-  // TODO: add Google Search Console verification once you register the site
-  // verification: {
-  //   google: "your-google-verification-code",
-  // },
-  alternates: {
-    canonical: BASE_URL,
-  },
+  alternates: { canonical: "/" },
   category: "technology",
 };
 
@@ -126,36 +83,39 @@ export default function RootLayout({
   // `color-scheme` style to <html> on the client, which the server can't know
   // about — this tells React to ignore that expected attribute mismatch.
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${brandSans.variable} ${brandMono.variable} ${noteFont.variable}`}
+    >
       <head>
-        {/* ImageKit serves the 47 AboutScrollSection frames (crossOrigin) */}
-        <link
-          rel="preconnect"
-          href="https://ik.imagekit.io"
-          crossOrigin="anonymous"
-        />
-        <link rel="dns-prefetch" href="https://ik.imagekit.io" />
-
+        {/* Decides before first paint whether the intro plays (once per session) */}
+        <script dangerouslySetInnerHTML={{ __html: introBootScript }} />
         <StructuredData />
-        <Analytics />
       </head>
-      <body
-        className={`${poppins.variable} ${cormorantGaramond.variable} antialiased  mx-auto `}
-      >
-        <CustomCursor />
+      <body className="antialiased" id="top">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-brand focus:px-4 focus:py-2 focus:text-brand-fg"
+        >
+          Skip to content
+        </a>
         <ConsoleLog />
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
+          <CustomCursor />
+          <IntroGate />
           <LenisWrapper>
             <Navbar />
-            {children}
+            <main id="main">{children}</main>
             <FooterSection />
-            {/* <FloatingDockDemo /> */}
           </LenisWrapper>
+          <AppToaster />
+          <Analytics />
         </ThemeProvider>
       </body>
     </html>

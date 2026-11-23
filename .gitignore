@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-build/
 /out/
 
 # production
@@ -43,3 +44,19 @@ aboutme.md
 .agents
 .playwright-mcp
 .claude
+# raw assets dropped in by hand (see public/_incoming/README.md)
+/public/_incoming/*
+!/public/_incoming/README.md
+
+# dev screenshots (Playwright captures during development)
+/docs/screens/
+PROJECTS.MD
+# local Python tools (rembg for asset prep)
+/.venv-tools/
+
+# local demos (not part of the site)
+/docs/demos/
+
+# Notes and docs stay local: only the root README goes to GitHub
+*.md
+!/README.md

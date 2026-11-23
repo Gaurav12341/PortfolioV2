@@ -3,46 +3,77 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ──────────────────────────────────────────────────────────────────────────
+   Design tokens (PHASES.md · Phase 1)
+   Raw tokens live in :root / .dark. Everything below maps them onto
+   Tailwind colour names, including the shadcn names the ui/ primitives use.
+   Contrast (WCAG): text/bg 15.6 L · 17.2 D, muted/bg 5.9 L · 7.3 D,
+   accent-text/bg 5.3 L · 5.6 D, accent-fg on accent 4.7 L · 5.6 D.
+   ────────────────────────────────────────────────────────────────────────── */
+
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-poppins: var(--font-poppins);
-  --font-accent: var(--font-accent);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
-  --color-ring: var(--ring);
-  --color-input: var(--input);
-  --color-border: var(--border);
-  --color-destructive: var(--destructive);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-accent: var(--accent);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-muted: var(--muted);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-secondary: var(--secondary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary: var(--primary);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-popover: var(--popover);
-  --color-card-foreground: var(--card-foreground);
-  --color-card: var(--card);
+  /* Fonts (src/app/fonts.ts): Archivo for text, JetBrains Mono for data */
+  --font-sans: var(--font-brand-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-brand-mono), ui-monospace, SFMono-Regular, monospace;
+
+  /* Fluid type scale. Use as text-display / text-h1 / text-h2 / text-h3 / text-lead */
+  --text-display: clamp(3rem, 1.6rem + 6vw, 7rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.025em;
+  --text-h1: clamp(2.5rem, 1.6rem + 3.6vw, 4.75rem);
+  --text-h1--line-height: 1;
+  --text-h1--letter-spacing: -0.03em;
+  --text-h2: clamp(2rem, 1.4rem + 2.4vw, 3.5rem);
+  --text-h2--line-height: 1.05;
+  --text-h2--letter-spacing: -0.03em;
+  --text-h3: clamp(1.25rem, 1.05rem + 0.8vw, 1.75rem);
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.02em;
+  --text-lead: clamp(1.0625rem, 0.98rem + 0.35vw, 1.25rem);
+  --text-lead--line-height: 1.6;
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Plan tokens as Tailwind colours: bg-bg, bg-surface, text-text,
+     text-accent-text, border-line, bg-brand …
+     The plan's --muted text colour is `text-muted-foreground` (shadcn name);
+     `bg-muted` is a quiet surface. */
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-solid: var(--surface-solid);
+  --color-text: var(--text);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--accent);
+  --color-brand-fg: var(--accent-fg);
+  --color-accent-text: var(--accent-text);
+
+  /* shadcn semantic names → plan tokens */
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--surface-solid);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--surface-solid);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-fg);
+  --color-secondary: var(--surface-muted);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--surface-muted);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--surface-muted);
+  --color-accent-foreground: var(--text);
+  --color-destructive: var(--accent);
+  --color-border: var(--line);
+  --color-input: var(--line-strong);
+  --color-ring: var(--accent);
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
   @keyframes marquee {
@@ -64,99 +95,256 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: #eddad4;
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(59.71% 0.23 23.86);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  color-scheme: light;
+  --radius: 0.75rem;
+
+  --bg: #f3e9e6;
+  --surface: rgb(255 255 255 / 0.6); /* use with backdrop-blur */
+  --surface-solid: #fbf6f4;
+  --surface-muted: #ebdfdb;
+  --text: #141216;
+  --muted: #5e5660;
+  --accent: #e11d48;
+  --accent-text: #be123c; /* accent for small text: #e11d48 is only 3.9:1 on --bg */
+  --accent-fg: #ffffff;
+  --line: rgba(20, 18, 22, 0.08);
+  --line-strong: rgba(20, 18, 22, 0.16);
+  --grid-line: rgba(20, 18, 22, 0.045);
+
+  /* Legacy aliases: older sections still reference these by name */
+  --font-poppins: var(--font-brand-sans);
+  --font-accent: var(--font-brand-sans);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(59.71% 0.23 23.86);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
+
+  --bg: #0b0a0d;
+  --surface: #15131a;
+  --surface-solid: #15131a;
+  --surface-muted: #1e1b24;
+  --text: #f2eef0;
+  --muted: #a39ba6;
+  --accent: #fb3b64;
+  --accent-text: #fb3b64;
+  --accent-fg: #0b0a0d; /* white on #fb3b64 is only 3.5:1 */
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.16);
+  --grid-line: rgba(255, 255, 255, 0.035);
 }
 
 @layer base {
   * {
-    font-family: var(--font-poppins);
     @apply border-border outline-ring/50;
   }
   html {
-    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    /* Large monitors (27" / 1440p+): scale the whole rem-based layout up
+       gently from 1920px wide, 16px → 19px max at ~2520px, so content
+       doesn't sit as a narrow column in a sea of empty space. */
+    font-size: clamp(1rem, 0.5vw + 0.4rem, 1.1875rem);
   }
   body {
     @apply bg-background text-foreground;
+    /* "Engineering paper" grid */
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: center top;
+    text-rendering: optimizeLegibility;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 700;
+    font-stretch: 112%;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
 }
 
 ::selection {
-  background-color: var(--primary);
-  color: var(--primary-foreground);
+  background-color: var(--accent);
+  color: var(--accent-fg);
 }
-/* Prevent iframe flickering with custom cursor */
+
+/* ── Entrance keyframes (CSS so they run before hydration) ─────────────── */
+@keyframes rise-in {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes scroll-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(250%);
+  }
+}
+@keyframes dash-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+/* Collab mark loops (components/common/collab-mark.tsx) */
+@keyframes collab-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes collab-glow {
+  50% {
+    box-shadow: 0 0 40px rgb(225 29 72 / 0.45);
+  }
+}
+@keyframes collab-pulse {
+  from {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+/* Usage: <div class="anim-fade-up" style="--d: 0.2s"> */
+.anim-fade-up {
+  animation: fade-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0s);
+}
+/* Same motion without the fade, for the LCP element: Chrome doesn't count an
+   element as painted while its opacity is 0, so a fade-in delays LCP. */
+@keyframes rise-up {
+  from {
+    transform: translateY(12px);
+  }
+  to {
+    transform: none;
+  }
+}
+.anim-rise-up {
+  animation: rise-up 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--d, 0s);
+}
+
+/* ── Intro preloader gate (see components/common/intro-gate.tsx) ────────── */
+html[data-intro="skip"] #intro-preloader {
+  display: none;
+}
+html.is-intro {
+  overflow: hidden;
+}
+/* Hold the hero's CSS entrance until the curtain lifts */
+html.is-intro .anim-fade-up,
+html.is-intro .anim-rise-up,
+html.is-intro [data-word] {
+  animation-play-state: paused !important;
+}
+
+/* ── Type roles ─────────────────────────────────────────────────────────── */
+/* The hero name: uppercase, extra-wide, heavy (a nameplate). */
+@utility type-nameplate {
+  font-weight: 800;
+  font-stretch: 125%;
+  text-transform: uppercase;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+}
+/* Handwritten-feel margin note: Victor Mono's cursive italics, in accent. */
+@utility type-note {
+  font-family: var(--font-note), ui-monospace, monospace;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--accent-text);
+}
+
+/* ── Page container: one width for every section ──────────────────────── */
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 1.5rem;
+  @media (min-width: 768px) {
+    padding-inline: 2.5rem;
+  }
+  @media (min-width: 1800px) {
+    max-width: 80rem;
+  }
+}
+
+/* ── Lenis (recommended base styles) ───────────────────────────────────── */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* ── Custom cursor ─────────────────────────────────────────────────────── */
+/* The native cursor is hidden only while the custom cursor is active, and
+   never inside text fields or iframes. */
+html.has-custom-cursor,
+html.has-custom-cursor * {
+  cursor: none;
+}
+html.has-custom-cursor :is(input, textarea, select, [contenteditable="true"], iframe) {
+  cursor: auto;
+}
+
+/* Prevent iframe flickering (Cal.com embed) */
 iframe {
   transform: translateZ(0);
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-/* Optional: Hide default cursor over iframes if needed */
-.cursor-hidden iframe {
-  cursor: none;
+/* ── View-transition theme switch ──────────────────────────────────────── */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* ── Reduced motion: kill CSS-driven motion site-wide ──────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

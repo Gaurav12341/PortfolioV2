@@ -1,19 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  /** Lets a production build run beside `next dev` without sharing .next (e.g. NEXT_DIST_DIR=.next-build). */
+  distDir: process.env.NEXT_DIST_DIR || ".next",
   images: {
-    domains: [
-      "images.unsplash.com",
-      "framerusercontent.com",
-      "avatar.vercel.sh"
-    ],
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
+    formats: ["image/avif", "image/webp"],
   },
 };
 

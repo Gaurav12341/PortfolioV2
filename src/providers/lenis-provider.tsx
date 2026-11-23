@@ -1,22 +1,17 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ReactLenis, useLenis } from "lenis/react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { setLenis } from "@/lib/scroll";
 
 gsap.registerPlugin(ScrollTrigger);
 
-type Props = {
-  children?: React.ReactNode;
-};
-
 /**
  * Drives Lenis from GSAP's ticker and keeps ScrollTrigger in sync with the
- * smoothed scroll position. Without this, pinned/scrubbed ScrollTriggers (e.g.
- * the About canvas section) read a scroll position that lags behind Lenis's
- * interpolation, which shows up as a jittery pin. Rendered inside <ReactLenis>
- * so `useLenis()` can reach the instance via context.
+ * smoothed scroll position, so pinned/scrubbed triggers don't jitter. Also
+ * publishes the instance to lib/scroll for nav links.
  */
 function LenisGsapSync() {
   const lenis = useLenis();
@@ -24,13 +19,14 @@ function LenisGsapSync() {
   useEffect(() => {
     if (!lenis) return;
 
+    setLenis(lenis);
     lenis.on("scroll", ScrollTrigger.update);
-
     const raf = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      setLenis(null);
       lenis.off("scroll", ScrollTrigger.update);
       gsap.ticker.remove(raf);
     };
@@ -39,17 +35,31 @@ function LenisGsapSync() {
   return null;
 }
 
-const LenisWrapper = ({ children }: Props) => {
+/**
+ * Smooth scrolling, unless the user prefers reduced motion (then native
+ * scrolling, no Lenis at all). Touch devices keep native momentum
+ * (syncTouch: false).
+ */
+const LenisWrapper = ({ children }: { children?: React.ReactNode }) => {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setEnabled(!mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
   return (
-    // autoRaf is off because GSAP's ticker drives Lenis (see LenisGsapSync),
-    // which avoids running two competing rAF loops.
-    // syncTouch:false (Lenis's default) means touch devices keep NATIVE momentum
-    // scrolling — Lenis stays out of the way on iOS/Android, so there's no
-    // fighting Safari's rubber-band / address-bar behaviour.
-    <ReactLenis root autoRaf={false} options={{ syncTouch: false }}>
-      <LenisGsapSync />
+    <>
+      {enabled && (
+        <ReactLenis root autoRaf={false} options={{ syncTouch: false }}>
+          <LenisGsapSync />
+        </ReactLenis>
+      )}
       {children}
-    </ReactLenis>
+    </>
   );
 };
 

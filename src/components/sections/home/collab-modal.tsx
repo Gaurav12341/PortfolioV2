@@ -1,15 +1,17 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { CONTACT_EMAIL } from "@/lib/constants";
 
 const schema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Valid email required"),
-  message: z.string().min(10, "Tell me a bit more (min 10 chars)"),
+  // max lengths match the server limits in app/api/collab/route.ts
+  name: z.string().min(1, "Name is required").max(100, "Keep it under 100 characters"),
+  email: z.string().email("Valid email required").max(254, "That email looks too long"),
+  message: z.string().min(10, "Tell me a bit more (min 10 chars)").max(5000, "Keep it under 5,000 characters"),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -588,7 +590,7 @@ export default function CollabModal({ isOpen, onClose }: Props) {
                             style={{ ...errorStyle, marginBottom: "12px" }}
                             role="alert"
                           >
-                            ↳ Something went wrong. Please try again.
+                            ↳ Something went wrong. Please try again, or email {CONTACT_EMAIL}.
                           </motion.p>
                         )}
 

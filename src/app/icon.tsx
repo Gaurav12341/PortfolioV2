@@ -1,36 +1,19 @@
 import { ImageResponse } from "next/og";
+import { BrandMark } from "./_brand/mark";
 
-// Image metadata
-export const size = {
-  width: 32,
-  height: 32,
-};
-export const contentType = "image/png";
+/** Favicon set from the monogram: 32 for tabs, 192 and 512 for the manifest. */
+const SIZES = { small: 32, medium: 192, large: 512 } as const;
 
-// Image generation
-export default function Icon() {
-  return new ImageResponse(
-    <div
-      style={{
-        background: "#000",
-        width: "100%",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
-        style={{
-          width: 16,
-          height: 16,
-          borderRadius: "50%",
-          background: "#ef4444",
-        }}
-      />
-    </div>,
-    {
-      ...size,
-    },
-  );
+export function generateImageMetadata() {
+  return Object.entries(SIZES).map(([id, s]) => ({
+    id,
+    size: { width: s, height: s },
+    contentType: "image/png",
+  }));
+}
+
+export default async function Icon({ id }: { id: Promise<string> | string }) {
+  const key = (await id) as keyof typeof SIZES;
+  const s = SIZES[key] ?? 32;
+  return new ImageResponse(<BrandMark size={s} />, { width: s, height: s });
 }

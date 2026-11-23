@@ -1,39 +1,17 @@
-import { MetadataRoute } from 'next'
-import { BASE_URL } from '@/lib/constants'
+import type { MetadataRoute } from "next";
+import { BASE_URL } from "@/lib/constants";
+import { workProjects } from "@/content/projects";
 
+/** Home plus every case study. Built from content, so new projects appear on their own. */
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = BASE_URL
-
+  const now = new Date();
   return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/services`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/portfolio`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
+    { url: BASE_URL, lastModified: now, changeFrequency: "monthly", priority: 1 },
+    ...workProjects.map((p) => ({
+      url: `${BASE_URL}/work/${p.slug}`,
+      lastModified: now,
+      changeFrequency: "yearly" as const,
       priority: 0.7,
-    },
-  ]
+    })),
+  ];
 }
