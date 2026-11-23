@@ -7,8 +7,12 @@
  * drop the new frames in, rerun the commands and update `frameCount`.
  */
 export const sequence = {
-  /** Frames f_000 … f_{frameCount-1}. */
-  frameCount: 28,
+  /**
+   * Frames f_000 … f_{frameCount-1}. 0–27 are the illustrated hand-sign
+   * sequence; 28–46 pan into the portrait (scripts/make-pan-frames.cjs), and
+   * the last frame is the portrait itself.
+   */
+  frameCount: 47,
   frame: (i: number, mobile: boolean) =>
     `/sequence/${mobile ? "m/" : ""}f_${String(i).padStart(3, "0")}.webp`,
 
@@ -27,22 +31,23 @@ export const sequence = {
   },
 
   /**
-   * Where the face sits in the 1920×1080 portrait, as 0–1 fractions. The
-   * circular reveal grows from here, and phones crop around it.
+   * Where the face sits in the 1920×1080 portrait, as 0–1 fractions. Phones
+   * crop around it: during the pan frames the crop eases from centre to here.
    */
   face: { x: 0.7, y: 0.24 },
 
-  /** Fine-tune the portrait against frame 27 (px offset + scale). */
-  align: { x: 0, y: 0, scale: 1 },
+  /** First frame of the pan into the portrait (phones start re-centring here). */
+  panStart: 28,
 
-  /** "circle" grows from the face; "wipe" sweeps left → right with an accent line. */
-  reveal: "circle" as "circle" | "wipe",
+  /** Scroll distance while pinned, in viewport heights. */
+  scrollVh: 200,
 
-  /** Scroll distance while pinned, in viewport heights (plan: ~150vh). */
-  scrollVh: 150,
-
-  /** Timeline split (fractions of the pinned scroll). */
-  phases: { framesEnd: 0.7, revealEnd: 0.85 },
+  /**
+   * Timeline split (fractions of the pinned scroll): frames scrub until
+   * framesEnd, where the live portrait layer takes over from the canvas;
+   * the intro text starts at introStart.
+   */
+  phases: { framesEnd: 0.75, introStart: 0.8 },
 
   /** Parallax strength on the portrait (px) and its slow push-in. */
   parallaxPx: 12,

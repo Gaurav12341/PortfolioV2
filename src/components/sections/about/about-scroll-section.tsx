@@ -23,16 +23,32 @@ function cover(W: number, H: number, focalX: number) {
   return { s, dw, dh, ox: (W - dw) * focalX, oy: (H - dh) / 2 };
 }
 
+/** Quadratic ease-out, matching the pan in scripts/make-pan-frames.cjs. */
+const easeOutQuad = (t: number) => 1 - (1 - t) * (1 - t);
+
+/**
+ * Horizontal crop focal point for frame i. Desktop stays centred; phones
+ * ease from centre to the face across the pan frames so the last frame
+ * lands exactly where the portrait layer is cropped.
+ */
+function focalFor(i: number, mobile: boolean) {
+  if (!mobile) return 0.5;
+  const from = sequence.panStart - 1;
+  const t = Math.min(1, Math.max(0, (i - from) / (sequence.frameCount - 1 - from)));
+  return 0.5 + (sequence.face.x - 0.5) * easeOutQuad(t);
+}
+
 /**
  * Scroll sequence (PHASES.md · Phase 5). The stage is CSS-sticky inside a
  * tall wrapper (robust with Lenis and flex parents); ScrollTrigger only
  * scrubs the timeline across the wrapper.
  *
- *  0 → 0.70  the 28 illustrated frames scrub on a pinned canvas
- *  0.70 → 0.85  the portrait is revealed with a crisp clip-path (circle
- *               from the face, or a wipe with an accent line). No blur.
- *  0.85 → 1  slow push-in + parallax on the portrait (scroll and pointer),
- *            the about intro fades in, then the pin releases.
+ *  0 → framesEnd   all frames scrub on a pinned canvas: the hand sign, then
+ *                  a whip-pan that eases to a stop on the portrait (the
+ *                  last frame is the portrait itself).
+ *  framesEnd → 1   the live portrait layer takes over (pixel-identical to the
+ *                  last frame), slow push-in + parallax (scroll and pointer),
+ *                  the about intro fades in, then the pin releases.
  *
  * Frame 0 loads first; the rest stream in progressively and the canvas
  * shows the nearest loaded frame meanwhile. Reduced motion: the portrait
@@ -45,12 +61,11 @@ export default function AboutScrollSection() {
   /** Sticky viewport-sized stage inside it. */
   const sectionRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const revealRef = useRef<HTMLDivElement>(null);
+  const portraitRef = useRef<HTMLDivElement>(null);
+  const shadeRef = useRef<HTMLDivElement>(null);
   const pushRef = useRef<HTMLDivElement>(null);
   const bgLayerRef = useRef<HTMLDivElement>(null);
   const subjectLayerRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-  const lineRef = useRef<HTMLDivElement>(null);
   const hintRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const framesRef = useRef<(HTMLImageElement | undefined)[]>([]);
@@ -84,7 +99,7 @@ export default function AboutScrollSection() {
       canvas.width = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
     }
-    const { dw, dh, ox, oy } = cover(W, H, 0.5);
+    const { dw, dh, ox, oy } = cover(W, H, focalFor(index, mobile));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.drawImage(img, ox, oy, dw, dh);
   };
@@ -131,46 +146,17 @@ export default function AboutScrollSection() {
   useGSAP(
     () => {
       if (reduce || !sectionRef.current) return;
-      const section = sectionRef.current;
-      const { framesEnd, revealEnd } = sequence.phases;
-      const faceFocal = mobile ? sequence.face.x : 0.5;
+      const { framesEnd, introStart } = sequence.phases;
+      const last = sequence.frameCount - 1;
 
-      const facePx = () => {
-        const W = section.clientWidth;
-        const H = section.clientHeight;
-        // portrait layers bleed 16px past each edge (room for parallax)
-        const g = cover(W + 32, H + 32, faceFocal);
-        const x = -16 + g.ox + sequence.face.x * g.dw + sequence.align.x;
-        const y = -16 + g.oy + sequence.face.y * g.dh + sequence.align.y;
-        const r = Math.hypot(Math.max(x, W - x), Math.max(y, H - y));
-        return { x, y, r };
+      // The live portrait layer (push-in, parallax) shows only on the last
+      // frame, which is the same image, so the handoff is invisible.
+      const setPortrait = (i: number) => {
+        if (portraitRef.current) portraitRef.current.style.visibility = i >= last ? "visible" : "hidden";
       };
+      setPortrait(0);
 
-      const setReveal = (p: number) => {
-        const el = revealRef.current;
-        if (!el) return;
-        if (sequence.reveal === "wipe") {
-          el.style.clipPath = `inset(0 ${(1 - p) * 100}% 0 0)`;
-          if (lineRef.current) {
-            lineRef.current.style.left = `${p * 100}%`;
-            lineRef.current.style.opacity = p > 0 && p < 1 ? "1" : "0";
-          }
-          return;
-        }
-        const { x, y, r } = facePx();
-        const R = p * r;
-        el.style.clipPath = p >= 1 ? "none" : `circle(${R}px at ${x}px ${y}px)`;
-        const ring = ringRef.current;
-        if (ring) {
-          ring.style.width = ring.style.height = `${R * 2}px`;
-          ring.style.left = `${x - R}px`;
-          ring.style.top = `${y - R}px`;
-          ring.style.opacity = p > 0 && p < 1 ? String(Math.min(1, (1 - p) * 3)) : "0";
-        }
-      };
-      setReveal(0);
-
-      const state = { f: 0, p: 0 };
+      const state = { f: 0 };
       const tl = gsap.timeline({
         defaults: { ease: "none" },
         scrollTrigger: {
@@ -185,20 +171,21 @@ export default function AboutScrollSection() {
       tl.to(
         state,
         {
-          f: sequence.frameCount - 1,
+          f: last,
           duration: framesEnd,
           onUpdate: () => {
             const i = Math.round(state.f);
             if (i !== currentRef.current) {
               currentRef.current = i;
               draw(i);
+              setPortrait(i);
             }
           },
         },
         0,
       )
         .to(hintRef.current, { opacity: 0, duration: 0.12 }, 0.02)
-        .to(state, { p: 1, duration: revealEnd - framesEnd, ease: "power1.inOut", onUpdate: () => setReveal(state.p) }, framesEnd)
+        .fromTo(shadeRef.current, { opacity: 0 }, { opacity: 1, duration: introStart + 0.1 - framesEnd }, framesEnd)
         .fromTo(
           pushRef.current,
           { scale: 1, y: 0 },
@@ -207,7 +194,7 @@ export default function AboutScrollSection() {
         );
 
       if (subjectLayerRef.current) {
-        tl.fromTo(subjectLayerRef.current, { y: 0 }, { y: -sequence.parallaxPx, duration: 1 - revealEnd }, revealEnd);
+        tl.fromTo(subjectLayerRef.current, { y: 0 }, { y: -sequence.parallaxPx, duration: 1 - framesEnd }, framesEnd);
       }
 
       const lines = textRef.current?.querySelectorAll<HTMLElement>("[data-line]");
@@ -215,16 +202,14 @@ export default function AboutScrollSection() {
         tl.fromTo(
           lines,
           { opacity: 0, y: 16 },
-          { opacity: 1, y: 0, duration: 0.1, stagger: 0.035, ease: "power2.out" },
-          revealEnd - 0.02,
+          // total stagger is capped so the timeline still ends at 1 (introStart + 0.1 + 0.1)
+          { opacity: 1, y: 0, duration: 0.1, stagger: { amount: 1 - introStart - 0.1 }, ease: "power2.out" },
+          introStart,
         );
       }
 
       draw(0);
-      const onResize = () => {
-        draw(currentRef.current);
-        setReveal(state.p);
-      };
+      const onResize = () => draw(currentRef.current);
       window.addEventListener("resize", onResize);
       return () => window.removeEventListener("resize", onResize);
     },
@@ -270,6 +255,8 @@ export default function AboutScrollSection() {
   const portraitSrc = mobile ? sequence.portrait.mobile : sequence.portrait.desktop;
   const subject = sequence.portrait.subject;
   const objectPosition = `${(mobile ? sequence.face.x : 0.5) * 100}% 50%`;
+  /** Intro lines start hidden and are faded in by the timeline. */
+  const hidden = reduce ? undefined : { opacity: 0 };
 
   return (
     <div
@@ -282,16 +269,13 @@ export default function AboutScrollSection() {
       aria-label="About intro"
       className={`${reduce ? "relative" : "sticky top-0"} h-svh w-full overflow-hidden bg-[#0b0a0d] text-[#f2eef0]`}
     >
-      {/* Frames */}
-      {!reduce && <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />}
+      {/* Frames. Bleeds 16px like the portrait layers so the last frame and
+          the live portrait share the exact same geometry. */}
+      {!reduce && <canvas ref={canvasRef} aria-hidden className="absolute -inset-4 h-[calc(100%+2rem)] w-[calc(100%+2rem)]" />}
 
-      {/* Portrait (revealed by clip-path; static under reduced motion) */}
-      <div ref={revealRef} className="absolute inset-0" style={reduce ? undefined : { clipPath: "circle(0px at 50% 50%)" }}>
+      {/* Portrait: takes over from the canvas on the last frame (static under reduced motion) */}
+      <div ref={portraitRef} className="absolute inset-0" style={reduce ? undefined : { visibility: "hidden" }}>
         <div ref={pushRef} className="absolute inset-0 will-change-transform">
-          <div
-            className="absolute inset-0"
-            style={{ transform: `translate(${sequence.align.x}px, ${sequence.align.y}px) scale(${sequence.align.scale})` }}
-          >
           <div ref={bgLayerRef} className="absolute -inset-4">
             <img src={portraitSrc} alt={sequence.portrait.alt} className="h-full w-full object-cover" style={{ objectPosition }} decoding="async" />
           </div>
@@ -307,19 +291,22 @@ export default function AboutScrollSection() {
               />
             </div>
           )}
-          </div>
         </div>
-        {/* Legibility: the intro sits on the portrait's dark left side */}
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent md:bg-gradient-to-r md:from-black/80 md:via-black/30 md:to-transparent" />
       </div>
 
-      {/* Reveal edge: thin accent ring (circle) or line (wipe) */}
-      {!reduce && sequence.reveal === "circle" && (
-        <div ref={ringRef} aria-hidden className="pointer-events-none absolute rounded-full border-[1.5px] border-brand opacity-0" />
-      )}
-      {!reduce && sequence.reveal === "wipe" && (
-        <div ref={lineRef} aria-hidden className="pointer-events-none absolute inset-y-0 w-px bg-brand opacity-0" />
-      )}
+      {/* Shade (fades in after the pan). Desktop: a full-width left → right
+          darkening, near-black under the text and still ~30% in the middle,
+          as in the reference. Phones: from the bottom, under the text. */}
+      <div ref={shadeRef} aria-hidden className="pointer-events-none absolute inset-0" style={reduce ? undefined : { opacity: 0 }}>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 md:hidden" />
+        <div
+          className="absolute inset-0 hidden md:block"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, rgb(0 0 0 / 0.72) 0%, rgb(0 0 0 / 0.62) 20%, rgb(0 0 0 / 0.5) 32%, rgb(0 0 0 / 0.32) 50%, rgb(0 0 0 / 0.12) 78%, rgb(0 0 0 / 0) 95%)",
+          }}
+        />
+      </div>
 
       {/* Scroll hint */}
       {!reduce && (
@@ -332,14 +319,52 @@ export default function AboutScrollSection() {
       )}
 
       {/* About intro */}
+      {/* Phones: bottom, over the bottom shade. Desktop: matches the reference
+          layout, sized in vw so it holds its proportions at any width: bracket
+          box from 3.75vw to ~32vw, vertically centred. */}
       <div ref={textRef} className="absolute inset-0 flex items-end md:items-center">
-        <div className="container-page pb-16 md:pb-0">
-          <div className="max-w-xl">
-            <h2 data-line className="text-h2 font-bold text-white" style={reduce ? undefined : { opacity: 0 }}>
-              {aboutIntro.headline}
+        <div className="w-full px-4 pb-10 md:w-auto md:px-0 md:pb-0 md:pl-[3.75vw]">
+          <div className="relative max-w-xl p-6 md:w-[max(28.5vw,23rem)] md:max-w-none md:px-[max(2vw,1.5rem)] md:py-[max(2.1vw,1.5rem)]">
+            {/* Corner brackets */}
+            {(["left-0 top-0 border-l border-t", "right-0 top-0 border-r border-t", "bottom-0 left-0 border-b border-l", "bottom-0 right-0 border-b border-r"] as const).map(
+              (pos) => (
+                <span key={pos} data-line aria-hidden className={`absolute h-8 w-8 border-brand/60 ${pos}`} style={hidden} />
+              ),
+            )}
+
+            <p data-line className="mb-5 font-mono text-[10px] uppercase tracking-[0.3em] text-brand md:mb-[1.2vw] md:text-[clamp(10px,0.6vw,13px)]" style={hidden}>
+              ✦ {aboutIntro.kicker} ✦
+            </p>
+
+            <h2 data-line className="mb-5 text-3xl font-bold leading-[1.08] text-white sm:text-4xl md:mb-[1.3vw] md:leading-[1.02] md:text-[clamp(1.75rem,2.6vw,3.75rem)]" style={hidden}>
+              {/* Desktop: two fixed lines, as in the reference (headings use balanced wrapping otherwise) */}
+              <span className="md:block md:whitespace-nowrap">{aboutIntro.headline.before}</span>{" "}
+              <span className="md:block md:whitespace-nowrap">
+                <em className="font-normal text-brand" style={{ fontFamily: "'DM Serif Display', Georgia, serif" }}>
+                  {aboutIntro.headline.emphasis}
+                </em>{" "}
+                {aboutIntro.headline.after}
+              </span>
             </h2>
-            <p data-line className="mt-5 max-w-lg text-lead text-white/75" style={reduce ? undefined : { opacity: 0 }}>
+
+            <p data-line className="mb-6 max-w-md text-sm leading-relaxed text-white/70 sm:text-base md:mb-[1.5vw] md:max-w-[max(23vw,18rem)] md:leading-[1.55] md:text-[clamp(0.8125rem,0.82vw,1.15rem)]" style={hidden}>
               {aboutIntro.line}
+            </p>
+
+            <div data-line aria-hidden className="mb-6 h-px w-24 bg-gradient-to-r from-brand to-transparent md:mb-[1.4vw] md:w-[4.2vw]" style={hidden} />
+
+            <ul data-line className="mb-8 flex flex-wrap items-center gap-3 md:mb-[1.6vw] md:gap-[0.6vw]" style={hidden}>
+              {aboutIntro.disciplines.map((d, i) => (
+                <li key={d} className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/60 md:gap-[0.6vw] md:text-[clamp(9px,0.5vw,11px)]">
+                  {i !== 0 && <span aria-hidden className="h-1 w-1 rounded-full bg-brand" />}
+                  {d}
+                </li>
+              ))}
+            </ul>
+
+            <p data-line style={hidden}>
+              <span className="font-mono text-xs uppercase tracking-[0.25em] text-white md:text-[clamp(10px,0.56vw,12px)]">{aboutIntro.status}</span>{" "}
+              <span aria-hidden className="text-brand">✦</span>
             </p>
           </div>
         </div>

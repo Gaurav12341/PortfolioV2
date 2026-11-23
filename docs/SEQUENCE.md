@@ -1,8 +1,11 @@
 # Scroll sequence: how to rebuild the assets
 
 The About intro (`src/components/sections/about/about-scroll-section.tsx`) scrubs
-illustrated frames on a canvas, then reveals the portrait with a clip-path circle.
-All tunables live in `src/content/sequence.ts`.
+47 frames on a canvas. Frames 0–27 are the illustrated hand-sign sequence. Frames
+28–46 are generated: the camera keeps panning right and eases to a stop on the
+portrait, with horizontal motion blur that fades as it slows. Frame 46 is the
+portrait itself, so the live portrait layer (push-in, parallax) takes over with no
+visible cut. All tunables live in `src/content/sequence.ts`.
 
 Sources stay in `public/_incoming/` (git-ignored). Outputs go to `public/sequence/`.
 ffmpeg comes from the `ffmpeg-static` dev dependency, so nothing global is needed.
@@ -10,13 +13,17 @@ ffmpeg comes from the `ffmpeg-static` dev dependency, so nothing global is neede
 ```bash
 FF=node_modules/ffmpeg-static/ffmpeg.exe   # macOS/Linux: node_modules/ffmpeg-static/ffmpeg
 
-# Frames: desktop (1600px) + mobile (900px). Input numbering starts at 00000.
-$FF -y -start_number 0 -i public/_incoming/frames/AboutSection_%05d.jpg -frames:v 28 \
+# 1. Pan frames 28–46 from frame 27 + the portrait (writes into public/_incoming/frames/).
+#    Rerun this whenever portrait-generated.jpg changes. Tunables are at the top of the script.
+node scripts/make-pan-frames.cjs
+
+# 2. Frames: desktop (1600px) + mobile (900px). Input numbering starts at 00000.
+$FF -y -start_number 0 -i public/_incoming/frames/AboutSection_%05d.jpg -frames:v 47 \
   -vf "scale=1600:-2" -c:v libwebp -quality 78 -start_number 0 public/sequence/f_%03d.webp
-$FF -y -start_number 0 -i public/_incoming/frames/AboutSection_%05d.jpg -frames:v 28 \
+$FF -y -start_number 0 -i public/_incoming/frames/AboutSection_%05d.jpg -frames:v 47 \
   -vf "scale=900:-2"  -c:v libwebp -quality 74 -start_number 0 public/sequence/m/f_%03d.webp
 
-# Portrait revealed after the last frame
+# 3. Portrait layer shown after the last frame (must be the same image as frame 46)
 $FF -y -i public/_incoming/portrait-generated.jpg -vf "scale=1600:-2" -c:v libwebp -quality 82 public/sequence/portrait.webp
 $FF -y -i public/_incoming/portrait-generated.jpg -vf "scale=900:-2"  -c:v libwebp -quality 80 public/sequence/m/portrait.webp
 ```
@@ -24,10 +31,15 @@ $FF -y -i public/_incoming/portrait-generated.jpg -vf "scale=900:-2"  -c:v libwe
 ## Using a reshoot
 
 1. Put the new frames in `public/_incoming/frames/` as `AboutSection_00000.jpg …`.
-2. Change `-frames:v 28` above to the new count and rerun both frame commands.
-3. Set `frameCount` in `src/content/sequence.ts` to the same number.
-4. If the last frame no longer lines up with the portrait, adjust `align` (px offset and
-   scale) and `face` (where the reveal circle starts, as 0–1 fractions).
+2. Update `FROM`/`TO` in `scripts/make-pan-frames.cjs` (last illustrated frame / last
+   frame) and run it.
+3. Change `-frames:v 47` above to `TO + 1` and rerun both frame commands.
+4. Set `frameCount` (`TO + 1`) and `panStart` (`FROM + 1`) in `src/content/sequence.ts`.
+5. `face` is where phones crop around the face in the portrait (0–1 fractions).
+
+The script overwrites `AboutSection_00046.jpg` with the portrait. The file that was
+there before (a copy of `portrait-generated.jpg`) is backed up in
+`public/_incoming/reference/` and can be deleted.
 
 ## Two-layer depth parallax (currently off)
 

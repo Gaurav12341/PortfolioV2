@@ -5,9 +5,14 @@
  */
 
 /** Lines shown at the end of the scroll sequence (Phase 5). */
+/** Closes the scroll sequence, over the portrait. */
 export const aboutIntro = {
-  headline: "I like systems that stay boring at 3 a.m.",
-  line: "Backend engineer at Honeywell, ~2 years in: .NET microservices, Kafka, Kubernetes, PostgreSQL. Now building applied AI on top: RAG, evals and agent workflows.",
+  kicker: "About Me",
+  /** Rendered as: before + <em>emphasis</em> + after. */
+  headline: { before: "I'd rather let the", emphasis: "work", after: "do the talking." },
+  line: "~2 years building backend systems and cloud platforms at Honeywell — plus hands-on experience shipping production AI/RAG systems on top of them. Built on one simple rule: ship something measurable, and defend it.",
+  disciplines: ["Backend", "Distributed Systems", "Cloud", "AI"],
+  status: "Open to Opportunities",
 } as const;
 
 export const about = {
