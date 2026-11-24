@@ -31,7 +31,8 @@ const SOCIAL_ICONS = {
 } as const;
 
 const linkCls =
-  "group inline-flex w-fit items-center gap-2 text-[15px] text-foreground/80 transition-colors duration-200 hover:text-accent-text";
+  // py/-my: a ~44px tall tap area on phones without changing the layout
+  "group -my-2.5 inline-flex w-fit items-center gap-2 py-2.5 text-[15px] text-foreground/80 transition-colors duration-200 hover:text-accent-text";
 
 /**
  * Footer (PHASES.md Phase 8): the closing line with the collab mark, sitemap,
@@ -164,7 +165,7 @@ export default function Footer() {
           <button
             type="button"
             onClick={() => scrollToTarget(0)}
-            className="group inline-flex items-center gap-2 rounded-full border border-line-strong px-3.5 py-1.5 text-foreground transition-[border-color,color,transform] duration-200 hover:border-brand hover:text-accent-text active:scale-[0.97]"
+            className="group relative inline-flex items-center gap-2 rounded-full border border-line-strong px-3.5 py-1.5 text-foreground after:absolute after:-inset-y-2 after:inset-x-0 transition-[border-color,color,transform] duration-200 hover:border-brand hover:text-accent-text active:scale-[0.97]"
           >
             Back to top
             <IconArrowUp

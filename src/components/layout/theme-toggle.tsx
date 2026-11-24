@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 import { prefersReducedMotion } from "@/lib/scroll";
 
 /**
- * Light/dark toggle. Starts from the system preference (next-themes
- * `defaultTheme="system"`) and remembers an explicit choice in localStorage.
+ * Light/dark toggle. Starts dark (next-themes `defaultTheme="dark"`) and
+ * remembers an explicit choice in localStorage.
  *
  * Where supported, the new theme is revealed with a circular view transition
  * from the button; under reduced motion it switches instantly.

@@ -2,6 +2,12 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+/* Short phone screens (e.g. iPhone SE 1st gen, 320×568): tighten tall overlays */
+@custom-variant short {
+  @media (max-width: 767px) and (max-height: 640px) {
+    @slot;
+  }
+}
 
 /* ──────────────────────────────────────────────────────────────────────────
    Design tokens (PHASES.md · Phase 1)
@@ -140,6 +146,8 @@
   html {
     font-family: var(--font-sans);
     -webkit-text-size-adjust: 100%;
+    /* no grey flash on tap (Android/iOS); keyboard focus still shows via :focus-visible */
+    -webkit-tap-highlight-color: transparent;
     /* Large monitors (27" / 1440p+): scale the whole rem-based layout up
        gently from 1920px wide, 16px → 19px max at ~2520px, so content
        doesn't sit as a narrow column in a sea of empty space. */
@@ -218,11 +226,6 @@
     transform: rotate(360deg);
   }
 }
-@keyframes collab-glow {
-  50% {
-    box-shadow: 0 0 40px rgb(225 29 72 / 0.45);
-  }
-}
 @keyframes collab-pulse {
   from {
     transform: scale(1);
@@ -231,6 +234,16 @@
   to {
     transform: scale(1.7);
     opacity: 0;
+  }
+}
+
+/* Cal booker loader sweep (contact/booker-skeleton.tsx) */
+@keyframes booker-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
   }
 }
 

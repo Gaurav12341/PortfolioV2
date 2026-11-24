@@ -130,7 +130,7 @@ export default function CollabModal({ isOpen, onClose }: Props) {
     paddingBottom: "12px",
     paddingTop: "4px",
     fontFamily: "var(--font-poppins)",
-    fontSize: "clamp(15px, 1.6vw, 19px)",
+    fontSize: "clamp(16px, 1.6vw, 19px)", // ≥16px: iOS Safari zooms into smaller inputs
     color: "white",
     caretColor: RED,
     transition: "border-color 0.3s ease",
@@ -254,7 +254,8 @@ export default function CollabModal({ isOpen, onClose }: Props) {
                 <motion.button
                   onClick={onClose}
                   className="flex items-center gap-3 cursor-pointer"
-                  style={{ background: "none", border: "none", padding: 0 }}
+                  // padding/-margin: a ~44px tap area on phones, same layout
+                  style={{ background: "none", border: "none", padding: "13px", margin: "-13px" }}
                   aria-label="Close collaboration form"
                   whileHover="hov"
                 >
