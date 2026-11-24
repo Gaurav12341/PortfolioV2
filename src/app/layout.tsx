@@ -13,11 +13,9 @@ import ConsoleLog from "@/components/common/console-log";
 import CustomCursor from "@/components/ui/custom-cursor";
 import { IntroGate, introBootScript } from "@/components/common/intro-gate";
 
+/** Dark is the default theme, so the browser UI matches the dark background everywhere. */
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3e9e6" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b0a0d" },
-  ],
+  themeColor: "#0b0a0d",
 };
 
 /** PHASES.md Phase 8. "·" instead of an em-dash: none in visible copy. */
@@ -103,8 +101,8 @@ export default function RootLayout({
         <ConsoleLog />
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <CustomCursor />

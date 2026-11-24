@@ -3,18 +3,25 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, useInView } from "motion/react";
-import { IconX } from "@tabler/icons-react";
 import dynamic from "next/dynamic";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
+import { SharinganEye, type SharinganHandle } from "@/components/common/sharingan-eye";
 
 /** The form (with zod + react-hook-form) loads on first hover/focus/click, not with the page. */
 const loadModal = () => import("@/components/sections/home/collab-modal");
 const CollabModal = dynamic(loadModal, { ssr: false });
+/** The form closes with a 0.88s circle wipe toward the centre; start the eye's
+    reverse once that has mostly cleared the button. */
+const CLOSE_REVERSE_DELAY_MS = 350;
 
 /**
- * The collab mark (taken from the old "Together we build" screen): a dark
- * puck with an ✕ that turns into a + on hover, a pulse ring, and the CTA
- * spelled out on an orbiting ring. Opens the collaboration form.
+ * The collab mark: a Sharingan eye with a pulse ring and the CTA spelled out
+ * on an orbiting ring. Opens the collaboration form.
+ *
+ * Eye: mouse hover (or keyboard focus) plays the Sharingan → Mangekyō
+ * transform, leaving reverses it; click / Enter / Space opens the form right
+ * away. On touch there's no hover, so each tap toggles the transform and the
+ * form opens once it finishes.
  *
  * Loops run only while it's on screen, and not at all under reduced motion.
  */
@@ -31,16 +38,62 @@ export function CollabMark({ label = "Let's collaborate ✦ Click to start ✦" 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  const eye = useRef<SharinganHandle>(null);
+  /** Pointer type of the press that leads to the next click ("" = keyboard). */
+  const pressType = useRef("");
+  const hovered = useRef(false);
+  const openForm = () => {
+    setUsed(true);
+    setOpen(true);
+  };
+  /* While the form is open it covers the button, which reads as the pointer
+     leaving: hold the eye transformed until the form closes, then reverse it
+     as the form's circle wipe uncovers the button (same on mouse and touch). */
+  const openRef = useRef(false);
+  openRef.current = open;
+  useEffect(() => {
+    if (open || !used) return;
+    const t = window.setTimeout(() => {
+      const b = ref.current;
+      if (b && !b.matches(":hover") && !b.matches(":focus-visible")) eye.current?.go(0);
+    }, CLOSE_REVERSE_DELAY_MS);
+    return () => window.clearTimeout(t);
+  }, [open, used]);
+
   return (
     <>
       <motion.button
         ref={ref}
         type="button"
-        onPointerEnter={loadModal}
-        onFocus={loadModal}
-        onClick={() => {
-          setUsed(true);
-          setOpen(true);
+        onPointerEnter={(e) => {
+          void loadModal();
+          if (e.pointerType === "touch") return;
+          hovered.current = true;
+          eye.current?.go(1);
+        }}
+        onPointerLeave={(e) => {
+          if (e.pointerType === "touch") return;
+          hovered.current = false;
+          if (!openRef.current && !e.currentTarget.matches(":focus-visible")) eye.current?.go(0);
+        }}
+        onFocus={(e) => {
+          void loadModal();
+          if (e.currentTarget.matches(":focus-visible")) eye.current?.go(1);
+        }}
+        onBlur={() => {
+          if (!openRef.current && !hovered.current) eye.current?.go(0);
+        }}
+        onPointerDown={(e) => {
+          pressType.current = e.pointerType;
+        }}
+        onClick={(e) => {
+          const touch = pressType.current === "touch" && e.detail > 0;
+          pressType.current = "";
+          if (!touch) return openForm();
+          // tap 1 plays, tap 2 reverses; the form opens when the eye settles
+          const to = eye.current?.target() === 1 ? 0 : 1;
+          if (eye.current) eye.current.go(to, openForm);
+          else openForm();
         }}
         aria-label="Open the collaboration form"
         aria-haspopup="dialog"
@@ -77,21 +130,8 @@ export function CollabMark({ label = "Let's collaborate ✦ Click to start ✦" 
           style={{ animationPlayState: live ? "running" : "paused", visibility: live ? "visible" : "hidden" }}
         />
 
-        {/* puck: dark in both themes so the crimson glows */}
-        <span className="relative flex size-16 items-center justify-center md:size-20">
-          <span
-            aria-hidden
-            className="absolute inset-0 animate-[collab-glow_3s_ease-in-out_infinite] rounded-full border border-brand/40 bg-[#0b0a0d]/90 shadow-[0_0_20px_rgb(225_29_72/0.2)] backdrop-blur-sm"
-            style={{ animationPlayState: live ? "running" : "paused" }}
-          />
-          {/* ✕ turns 45° into a + on hover: a join/add metaphor */}
-          <IconX
-            aria-hidden
-            size={28}
-            stroke={2.25}
-            className="relative text-[#fb3b64] drop-shadow-[0_0_10px_rgb(251_59_100/0.5)] transition-transform duration-500 ease-out group-hover:rotate-45 group-focus-visible:rotate-45"
-          />
-        </span>
+        {/* the eye fills the inner circle (same box as the old puck: no layout shift) */}
+        <SharinganEye ref={eye} reduce={reduce} preload={inView} className="size-16 md:size-20" />
       </motion.button>
 
       {mounted && used && createPortal(<CollabModal isOpen={open} onClose={() => setOpen(false)} />, document.body)}

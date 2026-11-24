@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { useTheme } from "next-themes";
 import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
+import { BookerSkeleton } from "./booker-skeleton";
 
 /** Brand colours per theme, matching --accent in globals.css. */
 const BRAND = { light: "#e11d48", dark: "#fb3b64" } as const;
@@ -21,7 +22,8 @@ type Status = "loading" | "ready" | "failed";
 /**
  * Inline Cal.com booker (PHASES.md · Phase 7). Themed to the site and
  * re-initialised when the theme or the chosen topic changes (the topic
- * prefills the notes field). Skeleton until Cal reports linkReady; the
+ * prefills the notes field). Skeleton until Cal reports linkReady, then a
+ * crossfade; the
  * "Open booking page" fallback if it fails or never loads.
  *
  * Scrolling: the iframe grows to its full height inside our own scroll box.
@@ -35,6 +37,8 @@ export function CalInline({ calLink, notes }: { calLink: string; notes?: string 
   const theme = resolvedTheme === "dark" ? "dark" : "light";
   const namespace = "contact";
   const [status, setStatus] = useState<Status>("loading");
+  /** the skeleton stays mounted while it fades out over the ready booker */
+  const [skeletonGone, setSkeletonGone] = useState(false);
   const reduce = useReducedMotionSafe();
   const boxRef = useRef<HTMLDivElement>(null);
   /** where the slot list starts inside the box, learned from Cal's own scroll */
@@ -48,6 +52,7 @@ export function CalInline({ calLink, notes }: { calLink: string; notes?: string 
   useEffect(() => {
     let alive = true;
     setStatus("loading");
+    setSkeletonGone(false);
     const timer = window.setTimeout(() => alive && setStatus((s) => (s === "ready" ? s : "failed")), TIMEOUT_MS);
     slotsTop.current = null;
     boxRef.current?.scrollTo({ top: 0 });
@@ -124,7 +129,9 @@ export function CalInline({ calLink, notes }: { calLink: string; notes?: string 
         />
       )}
 
-      {status === "loading" && <BookerSkeleton />}
+      {status !== "failed" && !skeletonGone && (
+        <BookerSkeleton href={href} leaving={status === "ready"} onLeft={() => setSkeletonGone(true)} />
+      )}
 
       {status === "failed" && (
         <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">
@@ -141,30 +148,6 @@ export function CalInline({ calLink, notes }: { calLink: string; notes?: string 
           </a>
         </div>
       )}
-    </div>
-  );
-}
-
-/** Shaped like the month view: details column, then a 7×5 date grid. */
-function BookerSkeleton() {
-  return (
-    <div role="status" className="absolute inset-0 grid animate-pulse gap-8 p-6 md:grid-cols-[13rem_1fr] md:p-8">
-      <div aria-hidden className="hidden space-y-3 md:block">
-        <div className="size-10 rounded-full bg-foreground/10" />
-        <div className="h-3 w-24 rounded bg-foreground/10" />
-        <div className="h-5 w-36 rounded bg-foreground/10" />
-        <div className="h-3 w-28 rounded bg-foreground/10" />
-        <div className="h-3 w-20 rounded bg-foreground/10" />
-      </div>
-      <div aria-hidden>
-        <div className="mb-6 h-5 w-40 rounded bg-foreground/10" />
-        <div className="grid grid-cols-7 gap-2">
-          {Array.from({ length: 35 }, (_, i) => (
-            <div key={i} className="aspect-square rounded-lg bg-foreground/[0.06]" />
-          ))}
-        </div>
-      </div>
-      <span className="sr-only">Loading the booking calendar</span>
     </div>
   );
 }

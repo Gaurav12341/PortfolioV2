@@ -17,9 +17,12 @@ import { useReducedMotionSafe } from "@/hooks/use-reduced-motion-safe";
 import { CAL_USERNAME, CONTACT_EMAIL, RESUME_PATH, SOCIAL_LINKS } from "@/lib/constants";
 import { trackResumeDownload } from "@/lib/analytics";
 import { LoadOnView } from "@/components/common/load-on-view";
+import { BookerSkeleton } from "./booker-skeleton";
 
-/** Cal.com's embed pulls ~700 KB of third-party JS: fetch it only near the booker. */
-const BookerPlaceholder = () => <div aria-hidden className="h-full animate-pulse bg-foreground/[0.04]" />;
+/** Cal.com's embed pulls ~700 KB of third-party JS: fetch it only near the
+    booker. The same skeleton covers every wait until Cal is ready. */
+const CAL_PAGE = CAL_USERNAME ? `https://cal.com/${CAL_USERNAME}/${contact.calEvent}` : undefined;
+const BookerPlaceholder = () => <BookerSkeleton href={CAL_PAGE} />;
 const CalInline = dynamic(() => import("./cal-inline").then((m) => m.CalInline), {
   ssr: false,
   loading: () => <BookerPlaceholder />,

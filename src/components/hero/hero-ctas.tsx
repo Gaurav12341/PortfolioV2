@@ -46,7 +46,7 @@ export function HeroCtas() {
       <a
         href={tertiary.href}
         onClick={(e) => go(e, tertiary.href)}
-        className="group ml-1 inline-flex items-center gap-1.5 text-[15px] font-medium text-foreground underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-brand"
+        className="group -my-2.5 ml-1 inline-flex items-center gap-1.5 py-2.5 text-[15px] font-medium text-foreground underline decoration-line-strong decoration-1 underline-offset-[6px] transition-colors hover:decoration-brand"
       >
         {tertiary.label}
         <ArrowRight

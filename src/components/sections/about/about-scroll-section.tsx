@@ -329,7 +329,7 @@ export default function AboutScrollSection() {
           darkening, near-black under the text and still ~30% in the middle,
           as in the reference. Phones: from the bottom, under the text. */}
       <div ref={shadeRef} aria-hidden className="pointer-events-none absolute inset-0" style={reduce ? undefined : { opacity: 0 }}>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 md:hidden" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-black/10 short:via-black/65 short:to-black/30 md:hidden" />
         <div
           className="absolute inset-0 hidden md:block"
           style={{
@@ -354,8 +354,8 @@ export default function AboutScrollSection() {
           layout, sized in vw so it holds its proportions at any width: bracket
           box from 3.75vw to ~32vw, vertically centred. */}
       <div ref={textRef} className="absolute inset-0 flex items-end md:items-center">
-        <div className="w-full px-4 pb-10 md:w-auto md:px-0 md:pb-0 md:pl-[3.75vw]">
-          <div className="relative max-w-xl p-6 md:w-[max(28.5vw,23rem)] md:max-w-none md:px-[max(2vw,1.5rem)] md:py-[max(2.1vw,1.5rem)]">
+        <div className="w-full px-4 pb-10 short:pb-5 md:w-auto md:px-0 md:pb-0 md:pl-[3.75vw]">
+          <div className="relative max-w-xl p-6 short:px-5 short:py-4 md:w-[max(28.5vw,23rem)] md:max-w-none md:px-[max(2vw,1.5rem)] md:py-[max(2.1vw,1.5rem)]">
             {/* Corner brackets */}
             {(["left-0 top-0 border-l border-t", "right-0 top-0 border-r border-t", "bottom-0 left-0 border-b border-l", "bottom-0 right-0 border-b border-r"] as const).map(
               (pos) => (
@@ -363,11 +363,11 @@ export default function AboutScrollSection() {
               ),
             )}
 
-            <p data-line className="mb-5 font-mono text-[10px] uppercase tracking-[0.3em] text-brand md:mb-[1.2vw] md:text-[clamp(10px,0.6vw,13px)]" style={hidden}>
+            <p data-line className="mb-5 font-mono text-[11px] uppercase tracking-[0.3em] text-brand short:mb-2.5 md:mb-[1.2vw] md:text-[clamp(10px,0.6vw,13px)]" style={hidden}>
               ✦ {aboutIntro.kicker} ✦
             </p>
 
-            <h2 data-line className="mb-5 text-3xl font-bold leading-[1.08] text-white sm:text-4xl md:mb-[1.3vw] md:leading-[1.02] md:text-[clamp(1.75rem,2.6vw,3.75rem)]" style={hidden}>
+            <h2 data-line className="mb-5 text-3xl font-bold leading-[1.08] text-white short:mb-3 short:text-[26px] sm:text-4xl md:mb-[1.3vw] md:leading-[1.02] md:text-[clamp(1.75rem,2.6vw,3.75rem)]" style={hidden}>
               {/* Desktop: two fixed lines, as in the reference (headings use balanced wrapping otherwise) */}
               <span className="md:block md:whitespace-nowrap">{aboutIntro.headline.before}</span>{" "}
               <span className="md:block md:whitespace-nowrap">
@@ -378,15 +378,15 @@ export default function AboutScrollSection() {
               </span>
             </h2>
 
-            <p data-line className="mb-6 max-w-md text-sm leading-relaxed text-white/70 sm:text-base md:mb-[1.5vw] md:max-w-[max(23vw,18rem)] md:leading-[1.55] md:text-[clamp(0.8125rem,0.82vw,1.15rem)]" style={hidden}>
+            <p data-line className="mb-6 max-w-md text-sm leading-relaxed text-white/70 short:mb-3.5 short:text-[13px] sm:text-base md:mb-[1.5vw] md:max-w-[max(23vw,18rem)] md:leading-[1.55] md:text-[clamp(0.8125rem,0.82vw,1.15rem)]" style={hidden}>
               {aboutIntro.line}
             </p>
 
-            <div data-line aria-hidden className="mb-6 h-px w-24 bg-gradient-to-r from-brand to-transparent md:mb-[1.4vw] md:w-[4.2vw]" style={hidden} />
+            <div data-line aria-hidden className="mb-6 h-px w-24 bg-gradient-to-r from-brand to-transparent short:mb-3.5 md:mb-[1.4vw] md:w-[4.2vw]" style={hidden} />
 
-            <ul data-line className="mb-8 flex flex-wrap items-center gap-3 md:mb-[1.6vw] md:gap-[0.6vw]" style={hidden}>
+            <ul data-line className="mb-8 flex flex-wrap items-center gap-3 short:mb-4 md:mb-[1.6vw] md:gap-[0.6vw]" style={hidden}>
               {aboutIntro.disciplines.map((d, i) => (
-                <li key={d} className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-white/60 md:gap-[0.6vw] md:text-[clamp(9px,0.5vw,11px)]">
+                <li key={d} className="flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-white/60 md:gap-[0.6vw] md:text-[clamp(9px,0.5vw,11px)]">
                   {i !== 0 && <span aria-hidden className="h-1 w-1 rounded-full bg-brand" />}
                   {d}
                 </li>

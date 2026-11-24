@@ -223,7 +223,9 @@ export function AboutDepth() {
             <Plane {...plane} z={-110} index={2} label="nameplate" depth={0.45} corner="tl">
               <motion.div
                 aria-hidden
-                className="absolute inset-x-0 top-[20svh] flex justify-center md:top-[21svh]"
+                // min tops keep the name clear of the "Let me Flex!" button after its
+                // 60px scroll drift (short phones, tablets, 14"/15.6" laptops)
+                className="absolute inset-x-0 top-[max(20svh,11.5rem)] flex justify-center md:top-[21svh] md:max-lg:top-[max(21svh,14rem)] lg:max-2xl:top-[max(21svh,13rem)]"
                 style={reduce ? undefined : { y: nameScrollY }}
               >
                 <motion.span
@@ -298,7 +300,7 @@ export function AboutDepth() {
             <p className="hidden md:block">move the mouse to orbit · esc to close</p>
           </motion.div>
 
-          <div className="group absolute right-6 top-24 z-10 md:right-10 md:top-28">
+          <div className="group absolute right-6 top-[4.75rem] z-10 md:right-10 md:top-20">
             <button
               type="button"
               onClick={() => setFlex((f) => !f)}
